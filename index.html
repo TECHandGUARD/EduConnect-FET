@@ -315,7 +315,33 @@
             background: #e0e7ff;
             border-radius: 20px;
             height: 20px;
-            gap: 0.5rem;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, #1a5f7a, #0d3b4f);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .sace-footer {
+            background: #1a1a2e;
+            color: #aaa;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .header-top {
+                flex-direction: column;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -345,96 +371,118 @@
 <div class="container">
     <div class="policy-banner">
         <h3>📜 Official Compliance Statement</h3>
-        <p>This platform operates in full alignment with the Western Cape Education Department (WCED) ePortal framework, the Curriculum and Assessment Policy Statement (CAPS) for FET Phase (Grades 10-12), and the South African Council for Educators (SACE) professional standards.</p>
+        <p>This platform operates in full alignment with the Western Cape Education Department (WCED) ePortal framework, the Curriculum and Assessment Policy Statement (CAPS) for FET Phase (Grades 10-12), and the South African Council for Educators (SACE) professional standards. All resources support learners preparing for the National Senior Certificate (Matric) examinations.</p>
         <div class="policy-links">
-            <a class="policy-link" onclick="alert('CAPS curriculum for FET Phase (Grades 10-12)')">📖 CAPS Document</a>
-            <a class="policy-link" onclick="alert('WCED ePortal provides digital resources for Matric learners')">🏫 WCED Framework</a>
-            <a class="policy-link" onclick="alert('SACE Code of Professional Ethics for educators')">👨‍🏫 SACE Code</a>
+            <a class="policy-link" onclick="showPolicy('caps')">📖 CAPS Document</a>
+            <a class="policy-link" onclick="showPolicy('wced')">🏫 WCED Framework</a>
+            <a class="policy-link" onclick="showPolicy('sace')">👨‍🏫 SACE Code of Conduct</a>
+            <a class="policy-link" onclick="showPolicy('dbe')">🇿🇦 DBE Policies</a>
         </div>
     </div>
 
     <div id="studentDashboard" class="dashboard active">
         <div class="welcome-banner">
             <h2>📖 Welcome, FET Phase Learner!</h2>
-            <p>Your learning journey is aligned with the <strong>CAPS curriculum for Grades 10-12</strong>. Prepare for your Matric exams.</p>
+            <p>Your learning journey is aligned with the <strong>CAPS curriculum for Grades 10-12</strong>. Master your subjects, track progress, and prepare for your Matric exams.</p>
         </div>
         <div class="cards-grid">
-            <div class="card" onclick="filterBySubject('Mathematics')"><div class="card-icon">🔢</div><h3>Mathematics</h3><p>Algebra, calculus, geometry, trigonometry.</p><span class="caps-tag">📋 CAPS: FET Mathematics</span></div>
-            <div class="card" onclick="filterBySubject('Physical Sciences')"><div class="card-icon">⚛️</div><h3>Physical Sciences</h3><p>Physics and Chemistry for Matric.</p><span class="caps-tag">📋 CAPS: FET Physical Sciences</span></div>
-            <div class="card" onclick="filterBySubject('Life Sciences')"><div class="card-icon">🧬</div><h3>Life Sciences</h3><p>Biology, genetics, and human anatomy.</p><span class="caps-tag">📋 CAPS: FET Life Sciences</span></div>
-            <div class="card" onclick="filterBySubject('Business Studies')"><div class="card-icon">🏢</div><h3>Business Studies</h3><p>Business environments and strategies.</p><span class="caps-tag">📋 CAPS: FET Business Studies</span></div>
+            <div class="card" onclick="filterBySubject('Mathematics')"><div class="card-icon">🔢</div><h3>Mathematics</h3><p>Algebra, calculus, geometry, trigonometry, functions, probability, and statistics.</p><span class="caps-tag">📋 CAPS: FET Mathematics</span></div>
+            <div class="card" onclick="filterBySubject('Physical Sciences')"><div class="card-icon">⚛️</div><h3>Physical Sciences</h3><p>Physics (mechanics, electricity, optics) and Chemistry (stoichiometry, organic, reactions).</p><span class="caps-tag">📋 CAPS: FET Physical Sciences</span></div>
+            <div class="card" onclick="filterBySubject('Life Sciences')"><div class="card-icon">🧬</div><h3>Life Sciences</h3><p>Biology, human anatomy, genetics, evolution, ecology, and practical investigations.</p><span class="caps-tag">📋 CAPS: FET Life Sciences</span></div>
+            <div class="card" onclick="filterBySubject('Accounting')"><div class="card-icon">📊</div><h3>Accounting</h3><p>Financial accounting, management accounting, auditing, and tax basics.</p><span class="caps-tag">📋 CAPS: FET Accounting</span></div>
+            <div class="card" onclick="filterBySubject('Business Studies')"><div class="card-icon">🏢</div><h3>Business Studies</h3><p>Business environments, functions, strategies, entrepreneurship, and ethics.</p><span class="caps-tag">📋 CAPS: FET Business Studies</span></div>
+            <div class="card" onclick="filterBySubject('Economics')"><div class="card-icon">💰</div><h3>Economics</h3><p>Microeconomics, macroeconomics, economic systems, growth, and development.</p><span class="caps-tag">📋 CAPS: FET Economics</span></div>
+            <div class="card" onclick="filterBySubject('History')"><div class="card-icon">🏛️</div><h3>History</h3><p>World history, South African history, essay writing, and source-based questions.</p><span class="caps-tag">📋 CAPS: FET History</span></div>
+            <div class="card" onclick="filterBySubject('Geography')"><div class="card-icon">🌍</div><h3>Geography</h3><p>Climatology, geomorphology, population, settlement, GIS, and mapwork.</p><span class="caps-tag">📋 CAPS: FET Geography</span></div>
+            <div class="card" onclick="filterBySubject('English HL')"><div class="card-icon">📖</div><h3>English Home Language</h3><p>Literature (poetry, novels, drama), creative writing, comprehension, and language.</p><span class="caps-tag">📋 CAPS: FET English HL</span></div>
+            <div class="card" onclick="filterBySubject('Life Orientation')"><div class="card-icon">🌟</div><h3>Life Orientation</h3><p>Personal well-being, citizenship, health, career guidance, and study skills for FET.</p><span class="caps-tag">📋 CAPS: FET Life Orientation</span></div>
         </div>
         <div id="studentResources" class="resource-list"></div>
         <div class="progress-section">
             <h3>📊 Your Matric Preparation Progress</h3>
             <div class="progress-bar-container"><div class="progress-bar" id="studentProgress"></div></div>
-            <p id="progressText">Complete lessons to track your Matric readiness!</p>
+            <p id="progressText">Complete CAPS-aligned lessons to track your Matric readiness!</p>
         </div>
     </div>
 
     <div id="parentDashboard" class="dashboard">
-        <div class="welcome-banner"><h2>🏠 Welcome, Parent!</h2><p>Support your teen's Matric journey.</p></div>
+        <div class="welcome-banner"><h2>🏠 Welcome, Parent / Guardian!</h2><p>Support your teen's Matric journey. Monitor progress across all Grade 10-12 subjects.</p></div>
         <div class="cards-grid">
-            <div class="card" onclick="showChildProgress()"><div class="card-icon">📈</div><h3>Academic Progress</h3><p>Track completion of CAPS topics.</p></div>
-            <div class="card" onclick="showAllResources()"><div class="card-icon">📚</div><h3>Resource Library</h3><p>Access all materials.</p></div>
+            <div class="card" onclick="showChildProgress()"><div class="card-icon">📈</div><h3>Academic Progress Report</h3><p>Track your child's completion of FET Phase curriculum topics.</p></div>
+            <div class="card" onclick="showAllResources()"><div class="card-icon">📚</div><h3>WCED Resource Library</h3><p>Access all CAPS-aligned materials for Grades 10-12.</p></div>
+            <div class="card" onclick="showParentGuide()"><div class="card-icon">💡</div><h3>Parent Support Guide</h3><p>Tips for supporting Matric learners during exam season.</p></div>
         </div>
         <div id="parentContent" class="resource-list"></div>
     </div>
 
     <div id="tutorDashboard" class="dashboard">
-        <div class="welcome-banner"><h2>👨‍🏫 Welcome, SACE-Registered Tutor!</h2><p>Share CAPS-aligned FET Phase content.</p></div>
+        <div class="welcome-banner"><h2>👨‍🏫 Welcome, SACE-Registered Tutor!</h2><p>Share CAPS-aligned FET Phase (Grades 10-12) content and support Matric exam preparation.</p></div>
         <div class="upload-form">
-            <h3>📤 Upload Content</h3>
-            <div class="form-group"><input type="text" id="resourceTitle" placeholder="Resource Title"></div>
-            <div class="form-group"><textarea id="resourceDesc" placeholder="Description..."></textarea></div>
-            <div class="form-group"><select id="resourceGrade"><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select></div>
-            <div class="form-group"><select id="resourceSubject"><option>Mathematics</option><option>Physical Sciences</option><option>Life Sciences</option><option>Business Studies</option></select></div>
-            <div class="form-group"><select id="resourceType"><option>Notes</option><option>Past Paper</option><option>Worksheet</option></select></div>
-            <div class="form-group"><label><input type="checkbox" id="capsConfirm"> ✅ I confirm CAPS alignment</label></div>
-            <button class="btn" onclick="uploadResource()">➕ Upload Resource</button>
+            <h3>📤 Upload CAPS-Aligned FET Phase Content</h3>
+            <div class="form-group"><input type="text" id="resourceTitle" placeholder="Resource Title (CAPS Topic)"></div>
+            <div class="form-group"><textarea id="resourceDesc" placeholder="Description — specify CAPS learning outcomes and Matric exam relevance..."></textarea></div>
+            <div class="form-group"><select id="resourceGrade"><option value="Grade 10">Grade 10 (FET Phase)</option><option value="Grade 11">Grade 11 (FET Phase)</option><option value="Grade 12">Grade 12 (FET Phase / Matric)</option></select></div>
+            <div class="form-group"><select id="resourceSubject"><option value="Mathematics">Mathematics</option><option value="Physical Sciences">Physical Sciences</option><option value="Life Sciences">Life Sciences</option><option value="Accounting">Accounting</option><option value="Business Studies">Business Studies</option><option value="Economics">Economics</option><option value="History">History</option><option value="Geography">Geography</option><option value="English HL">English Home Language</option><option value="Life Orientation">Life Orientation</option></select></div>
+            <div class="form-group"><select id="resourceType"><option value="Notes">📝 Study Notes</option><option value="Slides">📊 Lesson Slides</option><option value="Assignment">✏️ CAPS Assessment Task</option><option value="Past Paper">📜 Past Exam Paper</option><option value="Memo">✅ Memo/Answer Guide</option></select></div>
+            <div class="form-group"><label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" id="capsConfirm"> ✅ I confirm this resource is CAPS-aligned for FET Phase (Grades 10-12)</label></div>
+            <button class="btn" onclick="uploadResource()">➕ Upload Resource (CAPS Aligned | FET)</button>
         </div>
         <div id="tutorResources" class="resource-list"></div>
+        <div class="progress-section"><h3>👨‍🏫 SACE Professional Commitment</h3><p>By uploading resources, you affirm all materials are curriculum-aligned and appropriate for learners aged 15-18 preparing for the National Senior Certificate.</p></div>
     </div>
 </div>
 
 <div class="sace-footer">
-    <p>📚 EduConnect FET Phase — Aligned with WCED ePortal, CAPS Grades 10-12, and SACE Code of Ethics.</p>
-    <p>© 2025 EduConnect | FET Phase (Grades 10-12) | Matric Exam Preparation</p>
+    <p>📚 EduConnect FET Phase — Aligned with <strong>WCED ePortal</strong>, <strong>CAPS Grades 10-12</strong>, and <strong>SACE Code of Ethics</strong>. Supporting learners on their journey to the National Senior Certificate (Matric).</p>
+    <p style="margin-top: 0.8rem;">© 2025 EduConnect | FET Phase (Grades 10-12) | WCED Alignment | CAPS Curriculum | Matric Exam Preparation</p>
 </div>
 
 <script>
     let resources = JSON.parse(localStorage.getItem('eduResources_FET')) || [];
     if (resources.length === 0) {
         resources = [
-            { id: 1, title: "Calculus: Differentiation", desc: "First principles and rules", grade: "Grade 12", subject: "Mathematics", type: "Notes", uploadedBy: "Tutor" },
-            { id: 2, title: "Newton's Laws", desc: "Physics mechanics", grade: "Grade 11", subject: "Physical Sciences", type: "Notes", uploadedBy: "Tutor" },
-            { id: 3, title: "Human Reproduction", desc: "Life Sciences", grade: "Grade 12", subject: "Life Sciences", type: "Notes", uploadedBy: "Tutor" }
+            { id: 1, title: "Calculus: Differentiation", desc: "First principles, rules of differentiation, and applications (CAPS FET Mathematics)", grade: "Grade 12", subject: "Mathematics", type: "Notes", capsTopic: "Calculus", uploadedBy: "SACE Tutor" },
+            { id: 2, title: "Newton's Laws of Motion", desc: "Physics - mechanics for Grade 11 Physical Sciences", grade: "Grade 11", subject: "Physical Sciences", type: "Slides", capsTopic: "Mechanics", uploadedBy: "SACE Tutor" },
+            { id: 3, title: "The Great Gatsby - Essay Guide", desc: "Literature essay writing for English HL", grade: "Grade 11", subject: "English HL", type: "Notes", capsTopic: "Literature", uploadedBy: "SACE Tutor" },
+            { id: 4, title: "Accounting: Ledger Accounts", desc: "Step-by-step guide to posting to ledgers and trial balances", grade: "Grade 10", subject: "Accounting", type: "Worksheet", capsTopic: "Financial Accounting", uploadedBy: "SACE Tutor" },
+            { id: 5, title: "Mathematics P1 Nov 2024 Paper", desc: "National Senior Certificate past exam paper with memo", grade: "Grade 12", subject: "Mathematics", type: "Past Paper", capsTopic: "Exam Preparation", uploadedBy: "SACE Tutor" },
+            { id: 6, title: "Human Reproduction", desc: "Life Sciences - male and female reproductive systems", grade: "Grade 12", subject: "Life Sciences", type: "Notes", capsTopic: "Life Processes", uploadedBy: "SACE Tutor" }
         ];
-        localStorage.setItem('eduResources_FET', JSON.stringify(resources));
+        saveResources();
     }
-    let completed = JSON.parse(localStorage.getItem('eduCompleted_FET')) || [];
     function saveResources() { localStorage.setItem('eduResources_FET', JSON.stringify(resources)); }
-    function updateProgress() { let p = resources.length?(completed.length/resources.length)*100:0; let bar=document.getElementById('studentProgress'); if(bar) bar.style.width=p+'%'; document.getElementById('progressText').innerText = completed.length+' of '+resources.length+' completed'; }
-    function filterBySubject(s) { renderStudentResources(s); }
-    function renderStudentResources(filter) {
-        let container = document.getElementById('studentResources');
-        let filtered = filter ? resources.filter(r=>r.subject===filter) : resources;
-        container.innerHTML = filtered.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div>${!completed.includes(r.id)?'<button class="action-btn" onclick="markComplete('+r.id+')">✅ Mark Complete</button>':'<span>✓ Completed</span>'}</div>`).join('');
-    }
+    let completed = JSON.parse(localStorage.getItem('eduCompleted_FET')) || [];
     function markComplete(id) { if(!completed.includes(id)){ completed.push(id); localStorage.setItem('eduCompleted_FET', JSON.stringify(completed)); renderStudentResources(); updateProgress(); } }
-    function renderTutorResources() { let container=document.getElementById('tutorResources'); container.innerHTML=resources.map(r=>`<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p></div><button class="delete-btn" onclick="deleteResource(${r.id})">🗑 Delete</button></div>`).join(''); }
-    function deleteResource(id) { resources=resources.filter(r=>r.id!==id); saveResources(); renderTutorResources(); renderStudentResources(); updateProgress(); }
+    function updateProgress() { let p = resources.length>0 ? (completed.length/resources.length)*100 : 0; let bar = document.getElementById('studentProgress'); let txt = document.getElementById('progressText'); if(bar) bar.style.width = p+'%'; if(txt) txt.innerText = `🎓 Completed ${completed.length} of ${resources.length} FET Phase CAPS topics!`; }
+    let currentFilter = 'All';
+    function filterBySubject(s) { currentFilter = s; renderStudentResources(); }
+    function renderStudentResources() {
+        let container = document.getElementById('studentResources'); if(!container) return;
+        let filtered = currentFilter=='All' ? resources : resources.filter(r=>r.subject===currentFilter);
+        if(filtered.length===0){ container.innerHTML='<div class="resource-item"><p>No resources found for this subject. Check back for new FET Phase content!</p></div>'; return; }
+        container.innerHTML = filtered.map(res => `<div class="resource-item"><div class="resource-info"><h4>${res.title}</h4><p>${res.desc}</p><div class="resource-meta"><span class="meta-tag">${res.grade}</span><span class="meta-tag">${res.subject}</span><span class="meta-tag">${res.type}</span><span class="caps-badge-small">📋 CAPS: ${res.capsTopic}</span></div></div>${!completed.includes(res.id)?`<button class="action-btn" onclick="markComplete(${res.id})">✅ Mark Complete</button>`:'<span style="color:#10b981;">✓ Completed (Matric Ready)</span>'}</div>`).join('');
+    }
+    function renderTutorResources() {
+        let container = document.getElementById('tutorResources'); if(!container) return;
+        if(resources.length===0){ container.innerHTML='<div class="resource-item"><p>No resources yet. Upload FET Phase content above.</p></div>'; return; }
+        container.innerHTML = resources.map(res => `<div class="resource-item"><div class="resource-info"><h4>${res.title}</h4><p>${res.desc}</p><div class="resource-meta"><span class="meta-tag">${res.grade}</span><span class="meta-tag">${res.subject}</span><span class="caps-badge-small">CAPS: ${res.capsTopic}</span></div></div><button class="delete-btn" onclick="deleteResource(${res.id})">🗑 Remove</button></div>`).join('');
+    }
+    function deleteResource(id) { if(confirm('Delete this FET Phase resource?')){ resources=resources.filter(r=>r.id!==id); saveResources(); renderTutorResources(); renderStudentResources(); updateProgress(); } }
     function uploadResource() {
         let title=document.getElementById('resourceTitle').value, desc=document.getElementById('resourceDesc').value, grade=document.getElementById('resourceGrade').value, subject=document.getElementById('resourceSubject').value, type=document.getElementById('resourceType').value, confirmed=document.getElementById('capsConfirm').checked;
-        if(!title||!desc) { alert('Please complete all fields'); return; }
-        if(!confirmed) { alert('You must confirm CAPS alignment'); return; }
-        resources.push({ id:Date.now(), title, desc, grade, subject, type, uploadedBy:'Tutor' });
-        saveResources(); renderTutorResources(); alert('Resource uploaded!');
+        if(!title||!desc){ alert('Please complete all fields'); return; }
+        if(!confirmed){ alert('You must confirm CAPS alignment for FET Phase'); return; }
+        let capsMap = { 'Mathematics':'Calculus/Algebra', 'Physical Sciences':'Physics/Chemistry', 'Life Sciences':'Life Processes', 'Accounting':'Financial Accounting', 'Business Studies':'Business Environments', 'Economics':'Macroeconomics', 'History':'World/SA History', 'Geography':'Climatology/Geomorphology', 'English HL':'Literature/Language', 'Life Orientation':'Personal Well-being' };
+        resources.push({ id:Date.now(), title, desc, grade, subject, type, capsTopic:capsMap[subject]||'FET CAPS Topic', uploadedBy:'SACE Tutor' });
+        saveResources(); document.getElementById('resourceTitle').value=''; document.getElementById('resourceDesc').value=''; document.getElementById('capsConfirm').checked=false;
+        renderTutorResources(); alert('✅ FET Phase resource uploaded successfully! Supporting Matric preparation.');
     }
-    function showChildProgress() { document.getElementById('parentContent').innerHTML = '<div class="resource-item"><div><h4>Progress Report</h4><p>Completed '+completed.length+' of '+resources.length+' topics ('+Math.round((completed.length/resources.length)*100)+'%)</p></div></div>'; }
-    function showAllResources() { document.getElementById('parentContent').innerHTML = resources.map(r=>`<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div><button class="action-btn" onclick="alert('Accessing ${r.title}')">📥 Access</button></div>`).join(''); }
-    document.querySelectorAll('.role-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); let r=btn.getAttribute('data-role'); document.getElementById('studentDashboard').classList.remove('active'); document.getElementById('parentDashboard').classList.remove('active'); document.getElementById('tutorDashboard').classList.remove('active'); document.getElementById(r+'Dashboard').classList.add('active'); if(r==='student') renderStudentResources(); if(r==='tutor') renderTutorResources(); if(r==='parent') showChildProgress(); }); });
-    renderStudentResources(); renderTutorResources(); updateProgress();
+    function showChildProgress() { let parent=document.getElementById('parentContent'); let percent=resources.length?Math.round((completed.length/resources.length)*100):0; parent.innerHTML=`<div class="resource-item"><div class="resource-info"><h4>📊 FET Phase / Matric Progress Report</h4><p>Completed: ${completed.length} of ${resources.length} CAPS topics (${percent}%)</p><div class="progress-bar-container"><div class="progress-bar" style="width:${percent}%;"></div></div><p>🏅 <strong>Matric Exam Readiness:</strong> ${percent>=80?'Excellent!':percent>=50?'Good progress':'Focus on completing more CAPS topics'}</p></div></div>`; }
+    function showAllResources() { let parent=document.getElementById('parentContent'); if(resources.length===0){ parent.innerHTML='<div class="resource-item"><p>No FET Phase resources yet.</p></div>'; return; } parent.innerHTML=resources.map(res=>`<div class="resource-item"><div class="resource-info"><h4>${res.title}</h4><p>${res.desc}</p><div class="resource-meta"><span class="meta-tag">${res.grade}</span><span class="meta-tag">${res.subject}</span><span class="caps-badge-small">CAPS: ${res.capsTopic}</span></div></div><button class="action-btn" onclick="alert('📥 Accessing FET Phase resource: ${res.title}')">📥 Access Resource</button></div>`).join(''); }
+    function showParentGuide() { document.getElementById('parentContent').innerHTML=`<div class="resource-item"><div class="resource-info"><h4>💡 Supporting FET Phase Learners (Grades 10-12)</h4><ul style="margin-left:1.5rem;"><li>Create a structured study schedule (2-3 hours daily for Grade 12)</li><li>Encourage past paper practice 3 months before Matric exams</li><li>Help identify weak subjects and focus on them</li><li>Manage exam stress with breaks and good sleep</li></ul><p style="margin-top:1rem;">🎓 <strong>Matric Exam Tips:</strong> Start revision early, practice time management, and review marking guidelines.</p></div></div>`; }
+    function showPolicy(t) { let msgs={'caps':'📖 CAPS for FET Phase (Grades 10-12) includes subject guidelines and exam specifications for Matric.','wced':'🏫 WCED ePortal provides digital resources and past papers for Matric learners.','sace':'👨‍🏫 SACE Code requires tutors to maintain professional ethics.','dbe':'🇿🇦 DBE policies emphasize quality education and Matric exam preparation.'}; alert(msgs[t]||'FET Phase policy info'); }
+    document.querySelectorAll('.role-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); let role=btn.getAttribute('data-role'); document.getElementById('studentDashboard').classList.remove('active'); document.getElementById('parentDashboard').classList.remove('active'); document.getElementById('tutorDashboard').classList.remove('active'); document.getElementById(role+'Dashboard').classList.add('active'); if(role==='student'){ renderStudentResources(); updateProgress(); } else if(role==='tutor') renderTutorResources(); else if(role==='parent') showChildProgress(); }); });
+    renderStudentResources(); updateProgress(); renderTutorResources();
 </script>
 </body>
 </html>
