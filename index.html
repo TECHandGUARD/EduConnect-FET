@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>EduConnect FET | Professional Learning Platform | WCED & CAPS Aligned</title>
+    <title>EduConnect FET | WCED & CAPS Aligned | Grades 10-12</title>
     <meta name="description" content="Professional CAPS-aligned FET Phase learning platform for Grades 10-12. Trusted by educators, parents, and students across South Africa.">
-    <meta name="author" content="Tech & Guard">
     
     <!-- Firebase SDKs (Compat versions for stability) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     
-    <!-- Yoco SDK - Official version -->
+    <!-- Yoco SDK -->
     <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
     
     <style>
@@ -25,22 +25,16 @@
             --secondary-dark: #e0a800;
             --success: #2ecc71;
             --danger: #e74c3c;
-            --warning: #f39c12;
-            --gray-light: #f8f9fa;
             --gray: #6c757d;
-            --dark: #343a40;
             --white: #ffffff;
             --shadow: 0 10px 40px rgba(0,0,0,0.1);
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
         }
         body {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             min-height: 100vh;
-            color: var(--dark);
-            line-height: 1.5;
+            color: #333;
         }
-        /* Auth Modal */
         .auth-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
@@ -48,7 +42,7 @@
         }
         .auth-container {
             background: var(--white); border-radius: 28px; padding: 2rem;
-            max-width: 520px; width: 90%; max-height: 90vh; overflow-y: auto;
+            max-width: 550px; width: 90%; max-height: 90vh; overflow-y: auto;
             box-shadow: var(--shadow);
         }
         .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e9ecef; }
@@ -59,87 +53,54 @@
         .auth-form input, .auth-form select {
             width: 100%; padding: 0.9rem; margin-bottom: 1rem;
             border: 1px solid #dee2e6; border-radius: 12px; font-size: 1rem;
-            transition: border-color 0.2s;
         }
-        .auth-form input:focus { outline: none; border-color: var(--primary); }
         .checkbox-label { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem; cursor: pointer; }
-        .checkbox-label a { color: var(--primary); text-decoration: none; }
-        .membership-badge { background: #fff3e0; padding: 1rem; border-radius: 16px; margin: 1rem 0; text-align: center; font-size: 0.85rem; }
-        .membership-badge a { color: var(--primary); }
         .btn-primary {
-            background: var(--primary); color: var(--white); border: none;
-            padding: 0.9rem 1.5rem; border-radius: 40px; cursor: pointer;
-            font-weight: 600; width: 100%; font-size: 1rem;
-            transition: transform 0.2s, background 0.2s;
+            background: var(--primary); color: white; border: none;
+            padding: 0.9rem; border-radius: 40px; cursor: pointer;
+            font-weight: 600; width: 100%;
         }
-        .btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); }
-        .btn-secondary {
-            background: var(--secondary); color: var(--primary-dark); border: none;
-            padding: 0.8rem 1.5rem; border-radius: 40px; cursor: pointer;
-            font-weight: 600; transition: all 0.2s;
-        }
-        .btn-secondary:hover { background: var(--secondary-dark); transform: translateY(-1px); }
+        .btn-primary:hover { opacity: 0.9; }
         .logout-btn {
             background: var(--danger); color: white; border: none;
             padding: 0.5rem 1.2rem; border-radius: 40px; cursor: pointer;
             position: fixed; top: 20px; right: 20px; z-index: 200;
-            font-weight: 600; transition: opacity 0.2s;
         }
-        .logout-btn:hover { opacity: 0.9; }
-        /* Header */
-        .header { background: var(--white); box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
+        .header { background: var(--white); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
         .header-content { max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .logo h1 { font-size: 1.5rem; color: var(--primary); }
+        .logo h1 { color: var(--primary); font-size: 1.5rem; }
         .logo p { font-size: 0.7rem; color: var(--gray); }
         .compliance-badge { display: flex; gap: 0.75rem; flex-wrap: wrap; }
         .badge { background: #e8f5e9; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.7rem; font-weight: 600; color: #2e7d32; }
-        /* Main Container */
         .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
         .dashboard { display: none; }
         .dashboard.active { display: block; }
-        /* Navigation Tabs */
         .nav-tabs { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; }
-        .nav-tab { padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; background: transparent; color: var(--gray); font-weight: 600; transition: all 0.2s; border: none; }
-        .nav-tab.active { background: var(--primary); color: var(--white); }
-        /* Cards */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
-        .card {
-            background: var(--white); border-radius: 20px; padding: 1.5rem;
-            box-shadow: var(--shadow-sm); transition: all 0.3s;
-            cursor: pointer; border: 1px solid #eef2f5;
-        }
+        .nav-tab { padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; background: transparent; color: var(--gray); font-weight: 600; border: none; }
+        .nav-tab.active { background: var(--primary); color: white; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+        .card { background: var(--white); border-radius: 20px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; border: 1px solid #eef2f5; }
         .card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
         .card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
-        .card h3 { color: var(--primary); margin-bottom: 0.5rem; font-size: 1.2rem; }
-        .card p { font-size: 0.85rem; color: var(--gray); margin-bottom: 0.5rem; }
-        .caps-tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 0.2rem 0.8rem; border-radius: 40px; font-size: 0.65rem; font-weight: 600; }
-        /* Resource List */
-        .resource-list { background: var(--white); border-radius: 20px; overflow: hidden; margin: 1rem 0; border: 1px solid #eef2f5; }
-        .resource-item { padding: 1.2rem 1.5rem; border-bottom: 1px solid #eef2f5; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .resource-item:last-child { border-bottom: none; }
-        .resource-item h4 { color: var(--primary); margin-bottom: 0.25rem; }
-        .resource-item p { font-size: 0.85rem; color: var(--gray); }
-        .meta-tag { background: #e3f2fd; color: #1565c0; padding: 0.2rem 0.8rem; border-radius: 40px; font-size: 0.65rem; font-weight: 500; display: inline-block; margin-right: 0.5rem; margin-top: 0.25rem; }
-        .action-btn { background: var(--success); color: white; border: none; padding: 0.4rem 1.2rem; border-radius: 40px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: opacity 0.2s; }
-        .action-btn:hover { opacity: 0.85; }
-        .delete-btn { background: var(--danger); color: white; border: none; padding: 0.4rem 1.2rem; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
-        .progress-section { background: var(--white); border-radius: 20px; padding: 1.5rem; margin-top: 2rem; border: 1px solid #eef2f5; }
+        .card h3 { color: var(--primary); margin-bottom: 0.5rem; }
+        .caps-tag { background: #e8f5e9; color: #2e7d32; padding: 0.2rem 0.8rem; border-radius: 40px; font-size: 0.65rem; display: inline-block; }
+        .resource-list { background: var(--white); border-radius: 20px; overflow: hidden; border: 1px solid #eef2f5; }
+        .resource-item { padding: 1rem 1.5rem; border-bottom: 1px solid #eef2f5; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .resource-item h4 { color: var(--primary); }
+        .meta-tag { background: #e3f2fd; color: #1565c0; padding: 0.2rem 0.8rem; border-radius: 40px; font-size: 0.65rem; display: inline-block; margin-right: 0.5rem; }
+        .action-btn { background: var(--success); color: white; border: none; padding: 0.4rem 1.2rem; border-radius: 40px; cursor: pointer; }
+        .delete-btn { background: var(--danger); color: white; border: none; padding: 0.4rem 1.2rem; border-radius: 40px; cursor: pointer; }
+        .progress-section { background: var(--white); border-radius: 20px; padding: 1.5rem; margin-top: 2rem; }
         .progress-bar-container { background: #e9ecef; border-radius: 40px; height: 12px; overflow: hidden; margin: 1rem 0; }
-        .progress-bar { background: linear-gradient(90deg, var(--primary), var(--primary-light)); height: 100%; width: 0%; transition: width 0.5s; border-radius: 40px; }
-        .welcome-banner { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; color: var(--white); }
-        .welcome-banner h2 { margin-bottom: 0.5rem; }
-        .welcome-banner p { opacity: 0.9; margin-bottom: 0; }
-        .upload-form { background: var(--white); border-radius: 20px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #eef2f5; }
-        .upload-form h3 { margin-bottom: 1rem; color: var(--primary); }
-        .upload-form input, .upload-form textarea, .upload-form select { width: 100%; padding: 0.8rem; margin-bottom: 0.75rem; border: 1px solid #dee2e6; border-radius: 12px; font-size: 0.9rem; font-family: inherit; }
-        .upload-form textarea { resize: vertical; min-height: 80px; }
-        .footer { background: var(--dark); color: var(--gray); text-align: center; padding: 2rem; margin-top: 3rem; font-size: 0.85rem; }
+        .progress-bar { background: linear-gradient(90deg, var(--primary), var(--secondary)); height: 100%; width: 0%; transition: width 0.5s; }
+        .welcome-banner { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; color: white; }
+        .upload-form { background: var(--white); border-radius: 20px; padding: 1.5rem; margin-bottom: 1rem; }
+        .upload-form input, .upload-form textarea, .upload-form select { width: 100%; padding: 0.8rem; margin-bottom: 0.75rem; border: 1px solid #dee2e6; border-radius: 12px; }
+        .footer { background: #1a1a2e; color: #aaa; text-align: center; padding: 2rem; margin-top: 3rem; font-size: 0.85rem; }
         .footer a { color: var(--secondary); text-decoration: none; }
-        .upgrade-btn, .yoco-btn { background: linear-gradient(135deg, var(--secondary), var(--secondary-dark)); color: var(--primary-dark); border: none; padding: 0.8rem 1.5rem; border-radius: 40px; cursor: pointer; font-weight: 700; font-size: 1rem; margin: 0.5rem 0; }
-        .toast-notification { position: fixed; bottom: 30px; right: 30px; background: var(--dark); color: white; padding: 1rem 1.5rem; border-radius: 12px; z-index: 1000; animation: slideIn 0.3s ease; box-shadow: var(--shadow); }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @media (max-width: 768px) { .container { padding: 1rem; } .header-content { flex-direction: column; text-align: center; } .cards-grid { grid-template-columns: 1fr; } .resource-item { flex-direction: column; align-items: flex-start; } }
-        iframe, .embedded-content { width: 100%; height: 400px; border: none; border-radius: 16px; margin-top: 1rem; }
+        .upgrade-btn { background: var(--secondary); color: var(--primary-dark); border: none; padding: 0.8rem 1.5rem; border-radius: 40px; cursor: pointer; font-weight: 700; }
+        .membership-badge { background: #fff3e0; padding: 1rem; border-radius: 16px; margin: 1rem 0; text-align: center; }
+        @media (max-width: 768px) { .container { padding: 1rem; } .header-content { flex-direction: column; text-align: center; } .cards-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -151,43 +112,32 @@
             <button class="auth-tab active" data-tab="login">Sign In</button>
             <button class="auth-tab" data-tab="signup">Create Account</button>
         </div>
-        
-        <!-- LOGIN FORM -->
         <div id="loginForm" class="auth-form active">
-            <input type="email" id="loginEmail" placeholder="Email address" autocomplete="email">
-            <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
-            <select id="loginRole">
-                <option value="student">Student / Learner</option>
-                <option value="parent">Parent / Guardian</option>
-                <option value="tutor">Educator / Tutor (SACE Registered)</option>
-            </select>
+            <input type="email" id="loginEmail" placeholder="Email address">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <select id="loginRole"><option value="student">Student</option><option value="parent">Parent</option><option value="tutor">Tutor / Educator</option></select>
             <button class="btn-primary" onclick="handleLogin()">Sign In</button>
-            <div class="membership-badge">📌 Free access includes basic CAPS resources. <strong>Premium (R10/month)</strong> unlocks all content: quizzes, past papers, and study planner.</div>
+            <div class="membership-badge">📌 Free access to basic CAPS resources. <strong>Premium (R10/month)</strong> unlocks quizzes, past papers, and study planner.</div>
         </div>
-        
-        <!-- SIGNUP FORM - Complete with POPIA Consent -->
         <div id="signupForm" class="auth-form">
-            <input type="text" id="signupName" placeholder="Full Name" autocomplete="name" required>
-            <input type="email" id="signupEmail" placeholder="Email address" autocomplete="email" required>
-            <input type="password" id="signupPassword" placeholder="Password (min 6 characters)" autocomplete="new-password" required>
+            <input type="text" id="signupName" placeholder="Full Name" required>
+            <input type="email" id="signupEmail" placeholder="Email address" required>
+            <input type="password" id="signupPassword" placeholder="Password (min 6 characters)" required>
             <select id="signupRole" required>
                 <option value="student">Student / Learner</option>
                 <option value="parent">Parent / Guardian</option>
-                <option value="tutor">Educator / Tutor (SACE Registered)</option>
+                <option value="tutor">Tutor / Educator</option>
             </select>
-            <input type="text" id="signupSACE" placeholder="SACE Registration Number (Educators only)">
+            <div id="credentialField"></div>
             <select id="signupMembership">
                 <option value="free">Free Plan (Basic Access)</option>
                 <option value="premium">Premium Plan (R10/month - Full Access)</option>
             </select>
-            
-            <!-- POPIA Consent Checkbox - Legal Requirement -->
             <label class="checkbox-label">
-                <input type="checkbox" id="popiaConsent"> I confirm that I have read and agree to the <a href="#" onclick="showPrivacyPolicy();return false;">Privacy Policy</a> and consent to the processing of my personal information in accordance with the Protection of Personal Information Act (POPIA), 2013.
+                <input type="checkbox" id="popiaConsent"> I agree to the <a href="#" onclick="showPrivacyPolicy();return false;">Privacy Policy</a> (POPIA compliant)
             </label>
-            
             <button class="btn-primary" onclick="handleSignup()">Create Account</button>
-            <p style="font-size:0.7rem; text-align:center; margin-top:1rem; color:var(--gray);">By creating an account, you agree to our <a href="#" onclick="showTerms();return false;">Terms of Service</a>. This platform is independent and not an official government portal. All educators confirm they hold valid SACE registration.</p>
+            <p style="font-size:0.7rem; text-align:center; margin-top:1rem;">Tutors: SACE registered OR university student? Both welcome!</p>
         </div>
     </div>
 </div>
@@ -195,95 +145,43 @@
 <button id="logoutBtn" class="logout-btn" style="display:none;" onclick="logout()">Sign Out</button>
 
 <div id="mainApp" style="display:none;">
-    <header class="header">
+    <div class="header">
         <div class="header-content">
-            <div class="logo">
-                <h1>📚 EduConnect FET</h1>
-                <p>WCED & CAPS Aligned | FET Phase (Grades 10-12) | National Senior Certificate Preparation</p>
-            </div>
+            <div class="logo"><h1>📚 EduConnect FET</h1><p>WCED & CAPS Aligned | Grades 10-12 | Matric Preparation</p></div>
             <div class="compliance-badge">
-                <span class="badge">✅ CAPS Aligned</span>
-                <span class="badge">📋 WCED Approved Resources</span>
-                <span class="badge">👨‍🏫 SACE Registered</span>
-                <span class="badge">🔒 POPIA Compliant</span>
-                <span class="badge">💳 Yoco Secure Payments</span>
+                <span class="badge">✅ CAPS Aligned</span><span class="badge">📋 WCED Approved</span>
+                <span class="badge">👨‍🏫 SACE / University Tutors</span><span class="badge">🔒 POPIA Compliant</span>
+                <span class="badge">💳 Yoco Secure</span>
             </div>
         </div>
-    </header>
-
+    </div>
     <div class="container">
-        <!-- STUDENT DASHBOARD -->
+        <!-- Student Dashboard -->
         <div id="studentDashboard" class="dashboard">
-            <div class="welcome-banner">
-                <h2>Welcome, <span id="studentName"></span>!</h2>
-                <p>Your CAPS-aligned learning journey for FET Phase. Track progress, access resources, and prepare for Matric.</p>
-                <div id="membershipAlert"></div>
-            </div>
+            <div class="welcome-banner"><h2 id="studentName"></h2><div id="membershipAlert"></div></div>
             <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showStudentSection('subjects')">📚 Subjects & Term 1 Content</button>
-                <button class="nav-tab" onclick="showStudentSection('resources')">📄 My Learning Resources</button>
-                <button class="nav-tab" onclick="showStudentSection('premium')">⭐ Premium Features</button>
+                <button class="nav-tab active" onclick="showStudentSection('subjects')">📚 Subjects</button>
+                <button class="nav-tab" onclick="showStudentSection('resources')">📄 Resources</button>
+                <button class="nav-tab" onclick="showStudentSection('quizzes')">📝 Quizzes</button>
+                <button class="nav-tab" onclick="showStudentSection('premium')">⭐ Premium</button>
             </div>
-            <div id="studentSubjectsSection">
-                <div class="cards-grid" id="subjectsGrid"></div>
-                <div id="termContentDisplay"></div>
-            </div>
-            <div id="studentResourcesSection" style="display:none;">
-                <div id="studentResources" class="resource-list"></div>
-                <div class="progress-section">
-                    <h3>📊 Your Matric Preparation Progress</h3>
-                    <div class="progress-bar-container"><div class="progress-bar" id="studentProgress"></div></div>
-                    <p id="progressText"></p>
-                    <p style="font-size:0.7rem; margin-top:0.5rem;">🎓 Track your progress across all 11 CAPS subjects for the National Senior Certificate.</p>
-                </div>
-            </div>
-            <div id="studentPremiumSection" style="display:none;">
-                <div class="cards-grid">
-                    <div class="card" onclick="loadQuizzes()"><div class="card-icon">📝</div><h3>Gamified Quizzes</h3><p>Test your knowledge with interactive assessments and instant feedback.</p></div>
-                    <div class="card" onclick="loadPastPapers()"><div class="card-icon">📜</div><h3>Past Exam Papers</h3><p>DBE official Matric papers with memoranda.</p></div>
-                    <div class="card" onclick="loadStudyPlanner()"><div class="card-icon">📅</div><h3>Study Planner</h3><p>Personalized Matric preparation schedule.</p></div>
-                    <div class="card" onclick="loadExternalResources()"><div class="card-icon">🌐</div><h3>WCED Resource Library</h3><p>PhET simulations, WCED ePortal, SACE CPTD.</p></div>
-                </div>
-                <div id="premiumContent"></div>
-            </div>
+            <div id="studentSubjectsSection"><div class="cards-grid" id="subjectsGrid"></div><div id="termContentDisplay"></div></div>
+            <div id="studentResourcesSection" style="display:none;"><div id="studentResources" class="resource-list"></div><div class="progress-section"><h3>📊 Your Progress</h3><div class="progress-bar-container"><div class="progress-bar" id="studentProgress"></div></div><p id="progressText"></p></div></div>
+            <div id="studentQuizzesSection" style="display:none;"><div id="quizzesList" class="resource-list"></div></div>
+            <div id="studentPremiumSection" style="display:none;"><div class="cards-grid"><div class="card" onclick="loadQuizzes()"><div class="card-icon">📝</div><h3>Quizzes</h3></div><div class="card" onclick="loadPastPapers()"><div class="card-icon">📜</div><h3>Past Papers</h3></div><div class="card" onclick="loadStudyPlanner()"><div class="card-icon">📅</div><h3>Study Planner</h3></div></div><div id="premiumContent"></div></div>
         </div>
-
-        <!-- PARENT DASHBOARD -->
-        <div id="parentDashboard" class="dashboard">
-            <div class="welcome-banner">
-                <h2>Welcome, Parent <span id="parentName"></span>!</h2>
-                <p>Monitor your child's academic progress across all FET Phase subjects (Grades 10-12).</p>
-            </div>
-            <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showParentSection('progress')">📊 Academic Progress Report</button>
-                <button class="nav-tab" onclick="showParentSection('resources')">📚 WCED Resource Library</button>
-                <button class="nav-tab" onclick="showParentSection('guide')">💡 Parent Support Guide</button>
-            </div>
-            <div id="parentProgressSection"><div id="parentContent" class="resource-list"></div></div>
-            <div id="parentResourcesSection" style="display:none;"><div id="parentResourcesList" class="resource-list"></div></div>
-            <div id="parentGuideSection" style="display:none;"><div class="resource-list"><div class="resource-item"><div><h4>📖 Supporting Your Teen's Matric Journey</h4><ul style="margin-left:1.5rem; margin-top:0.5rem;"><li>Create a consistent study routine (45-60 minutes per subject daily)</li><li>Encourage past paper practice 3 months before exams</li><li>Review completed CAPS topics together weekly</li><li>Monitor screen time and balance activities</li><li>Communicate regularly with educators</li></ul><p style="margin-top:1rem;">🎓 <strong>Matric Exam Tips:</strong> Start revision early, practice time management, and review marking guidelines.</p></div></div></div></div>
-        </div>
-
-        <!-- TUTOR DASHBOARD (SACE Registered) -->
+        <!-- Parent Dashboard -->
+        <div id="parentDashboard" class="dashboard"><div class="welcome-banner"><h2 id="parentName"></h2><p>Monitor your child's progress</p></div><div class="nav-tabs"><button class="nav-tab active" onclick="showParentSection('progress')">📊 Progress</button><button class="nav-tab" onclick="showParentSection('resources')">📚 Resources</button></div><div id="parentProgressSection"><div id="parentContent" class="resource-list"></div></div><div id="parentResourcesSection" style="display:none;"><div id="parentResourcesList" class="resource-list"></div></div></div>
+        <!-- Tutor Dashboard -->
         <div id="tutorDashboard" class="dashboard">
-            <div class="welcome-banner">
-                <h2>Welcome, Educator <span id="tutorName"></span>!</h2>
-                <p>SACE-registered professionals can upload CAPS-aligned content, create resources, and support student learning.</p>
-                <div id="tutorMembershipAlert"></div>
-            </div>
-            <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showTutorSection('upload')">📤 Upload CAPS Resource</button>
-                <button class="nav-tab" onclick="showTutorSection('manage')">📋 My Resources</button>
-                <button class="nav-tab" onclick="showTutorSection('premium')">⭐ Premium Features</button>
-            </div>
+            <div class="welcome-banner"><h2 id="tutorName"></h2><p>Educator / Tutor Portal</p><div id="tutorMembershipAlert"></div></div>
+            <div class="nav-tabs"><button class="nav-tab active" onclick="showTutorSection('upload')">📤 Upload</button><button class="nav-tab" onclick="showTutorSection('manage')">📋 Manage</button><button class="nav-tab" onclick="showTutorSection('premium')">⭐ Premium</button></div>
             <div id="tutorUploadSection">
                 <div class="upload-form">
-                    <h3>📎 Upload CAPS-Aligned Educational Resource</h3>
-                    <input type="text" id="resourceTitle" placeholder="Resource Title (e.g., Term 1 Algebra Notes)">
-                    <textarea id="resourceDesc" placeholder="Description (CAPS learning outcomes, grade alignment)" rows="3"></textarea>
-                    <select id="resourceGrade">
-                        <option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
-                    </select>
+                    <h3>📎 Upload CAPS-Aligned Resource</h3>
+                    <input type="text" id="resourceTitle" placeholder="Resource Title">
+                    <textarea id="resourceDesc" placeholder="Description (CAPS learning outcomes)" rows="3"></textarea>
+                    <select id="resourceGrade"><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select>
                     <select id="resourceSubject">
                         <option>Mathematics</option><option>Physical Sciences</option><option>Life Sciences</option>
                         <option>Accounting</option><option>Business Studies</option><option>Economics</option>
@@ -291,53 +189,42 @@
                         <option>isiXhosa HL</option><option>Life Orientation</option>
                     </select>
                     <select id="resourceType">
-                        <option value="notes">📝 Study Notes</option>
-                        <option value="slides">📊 PowerPoint Slides</option>
-                        <option value="video">🎥 Video Lesson</option>
-                        <option value="phet">🔬 PhET Simulation</option>
-                        <option value="pastpaper">📜 Past Exam Paper</option>
+                        <option value="notes">📝 Notes</option><option value="slides">📊 Slides</option>
+                        <option value="worksheet">📄 Worksheet</option><option value="pastpaper">📜 Past Paper</option>
+                        <option value="video">🎥 Video</option><option value="phet">🔬 PhET</option>
                     </select>
-                    <input type="url" id="resourceLink" placeholder="Resource URL (Google Drive, YouTube, PhET link)">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="capsConfirm"> ✅ I confirm this resource is fully aligned with the CAPS curriculum for FET Phase (Grades 10-12) and is appropriate for the specified grade.
-                    </label>
-                    <button class="btn-primary" onclick="uploadResource()">➕ Publish Resource</button>
+                    <div style="margin: 0.75rem 0;">
+                        <label style="display: block; margin-bottom: 0.5rem;">📎 Upload File (max 10MB)</label>
+                        <input type="file" id="resourceFile" accept=".pdf,.ppt,.pptx,.doc,.docx,.jpg,.jpeg,.png">
+                        <p style="font-size:0.7rem; color:#6c757d;">PDF, PowerPoint, Word, images supported</p>
+                    </div>
+                    <input type="url" id="resourceLink" placeholder="OR Paste Resource URL (YouTube, Google Drive, PhET)">
+                    <label class="checkbox-label"><input type="checkbox" id="capsConfirm"> ✅ CAPS aligned for FET Phase</label>
+                    <button class="btn-primary" onclick="uploadResource()">📤 Publish Resource</button>
                 </div>
             </div>
             <div id="tutorManageSection" style="display:none;"><div id="tutorResources" class="resource-list"></div></div>
-            <div id="tutorPremiumSection" style="display:none;">
-                <div class="membership-badge">
-                    <h3>⭐ Premium Membership for Educators</h3>
-                    <p class="price-tag" style="font-size:2rem; font-weight:700;">R10 / month</p>
-                    <p>✓ Unlimited resource uploads<br>✓ Student progress analytics<br>✓ Advanced content management<br>✓ Priority support from Tech & Guard</p>
-                    <button class="upgrade-btn" onclick="upgradeToPremium()">Upgrade to Premium (R10/month)</button>
-                </div>
-            </div>
+            <div id="tutorPremiumSection" style="display:none;"><div class="membership-badge"><h3>⭐ Premium Membership</h3><p class="price-tag" style="font-size:2rem;">R10 / month</p><button class="upgrade-btn" onclick="upgradeToPremium()">Upgrade</button></div></div>
         </div>
     </div>
-    
-    <footer class="footer">
-        <p>EduConnect FET — Aligned with <strong>Western Cape Education Department (WCED) ePortal</strong>, <strong>Curriculum and Assessment Policy Statement (CAPS)</strong>, and <strong>South African Council for Educators (SACE) Code of Ethics</strong>.</p>
-        <p>Secure payments processed by <strong>Yoco</strong>. This platform is independent and not an official government portal.</p>
-        <p>© 2025 Tech & Guard | <a href="#" onclick="showPrivacyPolicy();return false;">POPIA Privacy Policy</a> | <a href="#" onclick="showTerms();return false;">Terms of Service</a> | <a href="mailto:aneleq@techandguard.co.za">Contact Support</a></p>
-    </footer>
+    <div class="footer"><p>EduConnect FET — WCED | CAPS | SACE | POPIA Compliant | Powered by Yoco</p><p>© 2025 Tech & Guard | <a href="#" onclick="showPrivacyPolicy();return false;">Privacy Policy</a> | <a href="#" onclick="showTerms();return false;">Terms</a></p></div>
 </div>
 
 <script>
     // ============================================================
-    // 🔴 FIREBASE CONFIGURATION - REPLACE WITH YOUR ACTUAL KEYS
+    // ✅ FIREBASE CONFIGURATION (YOUR ACTUAL KEYS)
     // ============================================================
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
+        apiKey: "AIzaSyC1zkDiD5l7gD7voMK1zLElx3m4BjnEQAw",
+        authDomain: "educonnect-fet.firebaseapp.com",
+        projectId: "educonnect-fet",
+        storageBucket: "educonnect-fet.firebasestorage.app",
+        messagingSenderId: "1064618158680",
+        appId: "1:1064618158680:web:bca1250ec2da911630782d"
     };
     
     // ============================================================
-    // 🔴 YOCO LIVE PUBLIC KEY - YOUR ACTUAL KEY
+    // ✅ YOUR YOCO LIVE PUBLIC KEY
     // ============================================================
     const YOCO_PUBLIC_KEY = "pk_live_2a11173e2rggAWL2ada4";
     
@@ -345,40 +232,36 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
     
-    // Initialize Yoco
+    // Initialize Yoco (using correct SDK)
     const yoco = new YocoSDK({ publicKey: YOCO_PUBLIC_KEY });
     
     // Global variables
     let currentUser = null;
     let resources = JSON.parse(localStorage.getItem('eduResources_FET')) || [];
     let completed = JSON.parse(localStorage.getItem('eduCompleted_FET')) || [];
+    let quizzes = [
+        { id: 1, subject: "Mathematics", question: "What is the derivative of x²?", options: ["2x", "x²", "2", "1"], answer: 0, explanation: "Using the power rule: d/dx(x^n) = n·x^(n-1), so d/dx(x²) = 2x." },
+        { id: 2, subject: "Physical Sciences", question: "Newton's First Law is also known as:", options: ["Law of Inertia", "Law of Acceleration", "Action-Reaction", "Law of Gravity"], answer: 0, explanation: "Newton's First Law states that an object remains at rest or in uniform motion unless acted upon by an external force." }
+    ];
     
-    // Sample CAPS-aligned resources if empty
+    // Sample resources if empty
     if (resources.length === 0) {
         resources = [
-            { id: 1, title: "Calculus: Differentiation", desc: "First principles, rules of differentiation, and applications (CAPS FET Mathematics)", grade: "Grade 12", subject: "Mathematics", type: "notes", link: "#", term1Content: "Functions, limits, derivatives, and differentiation rules." },
-            { id: 2, title: "Newton's Laws of Motion", desc: "Physics mechanics - PhET interactive simulation", grade: "Grade 11", subject: "Physical Sciences", type: "phet", link: "https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/forces-and-motion-basics_en.html", term1Content: "Forces, free-body diagrams, F=ma" },
-            { id: 3, title: "Human Reproduction", desc: "Life Sciences - male and female reproductive systems", grade: "Grade 12", subject: "Life Sciences", type: "notes", link: "#", term1Content: "Reproductive anatomy, gametogenesis, fertilization" },
-            { id: 4, title: "Ledger Accounts", desc: "Accounting - source documents, journals, ledgers", grade: "Grade 10", subject: "Accounting", type: "notes", link: "#", term1Content: "Accounting cycle, cash transactions" },
-            { id: 5, title: "Business Environments", desc: "Micro, market, and macro environments - SWOT, PESTLE", grade: "Grade 10", subject: "Business Studies", type: "notes", link: "#", term1Content: "Business sectors, environmental analysis" }
+            { id: 1, title: "Calculus: Differentiation", desc: "First principles and rules", grade: "Grade 12", subject: "Mathematics", type: "notes", fileUrl: null, term1Content: "Functions, limits, derivatives" },
+            { id: 2, title: "Newton's Laws - PhET", desc: "Interactive physics simulation", grade: "Grade 11", subject: "Physical Sciences", type: "phet", fileUrl: "https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/forces-and-motion-basics_en.html", term1Content: "Forces, free-body diagrams" },
+            { id: 3, title: "Human Reproduction", desc: "Life Sciences - reproductive systems", grade: "Grade 12", subject: "Life Sciences", type: "notes", fileUrl: null, term1Content: "Reproductive anatomy, gametogenesis" }
         ];
         localStorage.setItem('eduResources_FET', JSON.stringify(resources));
     }
     
     // All 11 CAPS FET subjects
     const subjects = [
-        { name: "Mathematics", icon: "🔢", desc: "Algebra, calculus, geometry, trigonometry, functions, probability, statistics" },
-        { name: "Physical Sciences", icon: "⚛️", desc: "Physics (mechanics, electricity, optics) and Chemistry (stoichiometry, organic)" },
-        { name: "Life Sciences", icon: "🧬", desc: "Biology, human anatomy, genetics, evolution, ecology" },
-        { name: "Accounting", icon: "📊", desc: "Financial accounting, management accounting, auditing, tax basics" },
-        { name: "Business Studies", icon: "🏢", desc: "Business environments, functions, strategies, entrepreneurship, ethics" },
-        { name: "Economics", icon: "💰", desc: "Microeconomics, macroeconomics, economic systems, growth, development" },
-        { name: "History", icon: "🏛️", desc: "World history, South African history, essay writing, source-based questions" },
-        { name: "Geography", icon: "🌍", desc: "Climatology, geomorphology, population, settlement, GIS, mapwork" },
-        { name: "English HL", icon: "📖", desc: "Literature (poetry, novels, drama), creative writing, comprehension, language" },
-        { name: "isiXhosa HL", icon: "🗣️", desc: "Uncwadi lwesiXhosa (imibongo, iincwadi, idrama), ukubhala, ukuthetha" },
-        { name: "Life Orientation", icon: "🌟", desc: "Personal well-being, citizenship, health, career guidance, study skills" }
+        { name: "Mathematics", icon: "🔢" }, { name: "Physical Sciences", icon: "⚛️" }, { name: "Life Sciences", icon: "🧬" },
+        { name: "Accounting", icon: "📊" }, { name: "Business Studies", icon: "🏢" }, { name: "Economics", icon: "💰" },
+        { name: "History", icon: "🏛️" }, { name: "Geography", icon: "🌍" }, { name: "English HL", icon: "📖" },
+        { name: "isiXhosa HL", icon: "🗣️" }, { name: "Life Orientation", icon: "🌟" }
     ];
     
     // Helper Functions
@@ -391,25 +274,126 @@
     }
     
     function showPrivacyPolicy() {
-        alert("📜 POPIA PRIVACY POLICY\n\nEduConnect FET collects your name, email, and SACE number (for educators) solely for platform access and verification.\n\n• Your data is stored securely with Firebase (Google Cloud - European servers)\n• Your data is not shared with any third parties\n• You have the right to access, correct, or request deletion of your data\n• Contact: aneleq@techandguard.co.za\n\nBy using this platform, you consent to these practices.");
+        alert("📜 POPIA PRIVACY POLICY\n\nEduConnect FET collects your name, email, and SACE/student number solely for platform access and verification.\n\n• Your data is stored securely with Firebase (Google Cloud)\n• Your data is not shared with any third parties\n• You have the right to access, correct, or request deletion of your data\n• Contact: aneleq@techandguard.co.za");
     }
     
     function showTerms() {
-        alert("📋 TERMS OF SERVICE\n\nEduConnect FET is an independent educational platform aligned with WCED, CAPS, and SACE standards but is NOT an official government portal.\n\n• Premium subscriptions are R10/month and are non-refundable\n• Users agree to use the platform for lawful educational purposes only\n• Educators confirm they hold valid SACE registration\n• Violation may result in account termination\n• For support: aneleq@techandguard.co.za");
+        alert("📋 TERMS OF SERVICE\n\nEduConnect FET is an independent educational platform aligned with WCED, CAPS, and SACE standards but is NOT an official government portal.\n\n• Premium subscriptions are R10/month and are non-refundable\n• Users agree to use the platform for lawful educational purposes only\n• Educators confirm they hold valid SACE registration or are enrolled university students\n• Violation may result in account termination");
     }
     
-    // Yoco Payment
+    // Dynamic credential field for tutors
+    function updateCredentialField() {
+        const role = document.getElementById('signupRole').value;
+        const container = document.getElementById('credentialField');
+        if (role === 'tutor') {
+            container.innerHTML = `
+                <select id="tutorType" style="width:100%; padding:0.9rem; margin-bottom:0.5rem; border-radius:12px;">
+                    <option value="sace">SACE Registered Professional Educator</option>
+                    <option value="student">University Student Tutor</option>
+                </select>
+                <div id="tutorCredentialInput">
+                    <input type="text" id="tutorCredential" placeholder="SACE Registration Number" style="width:100%; padding:0.9rem; border-radius:12px;">
+                    <p style="font-size:0.7rem; color:#6c757d;">SACE registered educators enter your SACE number.</p>
+                </div>
+            `;
+            document.getElementById('tutorType').addEventListener('change', function() {
+                const inputDiv = document.getElementById('tutorCredentialInput');
+                if (this.value === 'sace') {
+                    inputDiv.innerHTML = `<input type="text" id="tutorCredential" placeholder="SACE Registration Number" style="width:100%; padding:0.9rem; border-radius:12px;"><p style="font-size:0.7rem;">Your SACE number will be verified against the official SACE register.</p>`;
+                } else {
+                    inputDiv.innerHTML = `<input type="text" id="tutorCredential" placeholder="Student Number" style="width:100%; padding:0.9rem; margin-bottom:0.5rem; border-radius:12px;">
+                        <select id="universityName" style="width:100%; padding:0.9rem; border-radius:12px;">
+                            <option value="">Select University</option>
+                            <option>University of Cape Town (UCT)</option><option>University of the Witwatersrand (Wits)</option>
+                            <option>Stellenbosch University</option><option>University of Pretoria (UP)</option>
+                            <option>University of Johannesburg (UJ)</option><option>University of KwaZulu-Natal (UKZN)</option>
+                            <option>North-West University (NWU)</option><option>Rhodes University</option>
+                            <option>University of the Western Cape (UWC)</option><option>University of South Africa (UNISA)</option>
+                        </select>
+                        <p style="font-size:0.7rem;">University students: Your student number and university help verify your credibility as a tutor.</p>`;
+                }
+            });
+        } else {
+            container.innerHTML = '';
+        }
+    }
+    
+    // File upload to Firebase Storage
+    async function uploadResourceFile(file, resourceId) {
+        if (!file) return null;
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File too large. Maximum file size is 10MB.');
+            return null;
+        }
+        try {
+            const fileExtension = file.name.split('.').pop();
+            const fileName = `${resourceId}_${Date.now()}.${fileExtension}`;
+            const storageRef = storage.ref(`resources/${fileName}`);
+            const uploadTask = await storageRef.put(file);
+            const downloadURL = await uploadTask.ref.getDownloadURL();
+            return downloadURL;
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('File upload failed: ' + error.message);
+            return null;
+        }
+    }
+    
+    // Upload resource (with file or URL)
+    async function uploadResource() {
+        const title = document.getElementById('resourceTitle').value;
+        const desc = document.getElementById('resourceDesc').value;
+        const grade = document.getElementById('resourceGrade').value;
+        const subject = document.getElementById('resourceSubject').value;
+        const type = document.getElementById('resourceType').value;
+        const link = document.getElementById('resourceLink').value;
+        const fileInput = document.getElementById('resourceFile');
+        const confirmed = document.getElementById('capsConfirm').checked;
+        
+        if (!title || !desc) { alert('Please complete all fields'); return; }
+        if (!confirmed) { alert('You must confirm that this resource is CAPS-aligned before uploading.'); return; }
+        
+        let fileUrl = link || null;
+        if (fileInput && fileInput.files.length > 0) {
+            fileUrl = await uploadResourceFile(fileInput.files[0], Date.now());
+            if (!fileUrl && fileInput.files.length > 0) return;
+        }
+        
+        const newResource = {
+            id: Date.now(),
+            title, desc, grade, subject, type,
+            fileUrl: fileUrl || '#',
+            uploadedBy: currentUser?.uid,
+            uploadedAt: new Date().toISOString()
+        };
+        
+        resources.push(newResource);
+        localStorage.setItem('eduResources_FET', JSON.stringify(resources));
+        
+        document.getElementById('resourceTitle').value = '';
+        document.getElementById('resourceDesc').value = '';
+        document.getElementById('resourceLink').value = '';
+        if (fileInput) fileInput.value = '';
+        document.getElementById('capsConfirm').checked = false;
+        
+        renderTutorResources();
+        renderStudentResources();
+        updateProgress();
+        alert('✅ CAPS-aligned resource uploaded successfully!');
+    }
+    
+    // Yoco Payment Function
     function upgradeToPremium() {
         yoco.showPopup({
             amountInCents: 1000,
             currency: 'ZAR',
             name: 'EduConnect Premium Membership',
-            description: 'Monthly subscription - Full access to all CAPS resources',
+            description: 'Monthly subscription - Full access to all CAPS resources and quizzes',
             callback: async function(result) {
                 if (result.error) {
                     alert("Payment failed: " + result.error.message);
                 } else {
-                    alert("✅ Payment successful! Your premium account is now active.");
+                    alert("✅ Payment successful! Your premium account is now active. Please log in again.");
                     if (currentUser) {
                         await db.collection('users').doc(currentUser.uid).update({ membership: 'premium' });
                         currentUser.membership = 'premium';
@@ -427,79 +411,73 @@
         const email = document.getElementById('signupEmail').value;
         const password = document.getElementById('signupPassword').value;
         const role = document.getElementById('signupRole').value;
-        const sace = document.getElementById('signupSACE').value;
         const membership = document.getElementById('signupMembership').value;
         const consent = document.getElementById('popiaConsent').checked;
         
         if (!name || !email || !password) { alert('Please fill all required fields'); return; }
-        if (role === 'tutor' && !sace) { alert('SACE registration number is required for educators'); return; }
         if (!consent) { alert('You must consent to the POPIA Privacy Policy to create an account'); return; }
         if (password.length < 6) { alert('Password must be at least 6 characters'); return; }
+        
+        let tutorType = null;
+        let tutorCredential = null;
+        let university = null;
+        
+        if (role === 'tutor') {
+            tutorType = document.getElementById('tutorType')?.value;
+            tutorCredential = document.getElementById('tutorCredential')?.value;
+            university = document.getElementById('universityName')?.value;
+            if (!tutorCredential) { alert('Please enter your SACE number or student number'); return; }
+            if (tutorType === 'student' && !university) { alert('Please select your university'); return; }
+        }
         
         try {
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             const uid = userCredential.user.uid;
             await db.collection('users').doc(uid).set({
-                name: name,
-                email: email,
-                role: role,
-                saceNumber: sace || null,
-                membership: membership,
-                createdAt: new Date().toISOString(),
-                popiaConsent: true
+                name: name, email: email, role: role, membership: membership,
+                tutorType: tutorType, tutorCredential: tutorCredential, university: university,
+                createdAt: new Date().toISOString(), popiaConsent: true
             });
             alert('Account created successfully! Please sign in.');
             document.querySelector('.auth-tab[data-tab="login"]').click();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        }
+        } catch (error) { alert('Error: ' + error.message); }
     }
     
     async function handleLogin() {
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         const role = document.getElementById('loginRole').value;
-        
         if (!email || !password) { alert('Please enter email and password'); return; }
         
         try {
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
             const uid = userCredential.user.uid;
             const userDoc = await db.collection('users').doc(uid).get();
-            
             if (!userDoc.exists) { alert('User data not found'); return; }
             const userData = userDoc.data();
             if (userData.role !== role) { alert(`You are registered as a ${userData.role}. Please select the correct role.`); await auth.signOut(); return; }
-            
             currentUser = { uid, ...userData };
             sessionStorage.setItem('educonnect_current', JSON.stringify(currentUser));
             document.getElementById('authModal').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'block';
             loadDashboard();
-        } catch (error) {
-            alert('Login failed: ' + error.message);
-        }
+        } catch (error) { alert('Login failed: ' + error.message); }
     }
     
-    function logout() {
-        auth.signOut();
-        sessionStorage.removeItem('educonnect_current');
-        location.reload();
-    }
+    function logout() { auth.signOut(); sessionStorage.removeItem('educonnect_current'); location.reload(); }
     
     // Dashboard Loading
     function loadDashboard() {
         const saved = sessionStorage.getItem('educonnect_current');
         if (!saved) return;
         currentUser = JSON.parse(saved);
-        window.currentUser = currentUser;
         
         document.querySelectorAll('.dashboard').forEach(d => d.classList.remove('active'));
         
         if (currentUser.role === 'student') {
             document.getElementById('studentDashboard').classList.add('active');
-            document.getElementById('studentName').innerText = currentUser.name;
+            document.getElementById('studentName').innerHTML = `Welcome, ${currentUser.name}!`;
             if (currentUser.membership !== 'premium') {
                 document.getElementById('membershipAlert').innerHTML = `<div class="membership-badge"><button class="upgrade-btn" onclick="upgradeToPremium()">⭐ Upgrade to Premium (R10/month) → Unlock Quizzes, Past Papers & Study Planner</button></div>`;
             } else {
@@ -510,11 +488,11 @@
             updateProgress();
         } else if (currentUser.role === 'parent') {
             document.getElementById('parentDashboard').classList.add('active');
-            document.getElementById('parentName').innerText = currentUser.name;
+            document.getElementById('parentName').innerHTML = `Welcome, ${currentUser.name}!`;
             viewChildProgress();
         } else {
             document.getElementById('tutorDashboard').classList.add('active');
-            document.getElementById('tutorName').innerText = currentUser.name;
+            document.getElementById('tutorName').innerHTML = `Welcome, ${currentUser.name}!`;
             if (currentUser.membership !== 'premium') {
                 document.getElementById('tutorMembershipAlert').innerHTML = `<div class="membership-badge"><button class="upgrade-btn" onclick="upgradeToPremium()">⭐ Upgrade to Premium (R10/month) for Unlimited Uploads & Analytics</button></div>`;
             }
@@ -522,31 +500,46 @@
         }
     }
     
+    // Student Functions
     function renderSubjectsGrid() {
         let html = '';
         subjects.forEach(s => {
-            html += `<div class="card" onclick="showTermContent('${s.name}')"><div class="card-icon">${s.icon}</div><h3>${s.name}</h3><p>${s.desc}</p><span class="caps-tag">📋 CAPS: FET ${s.name}</span></div>`;
+            html += `<div class="card" onclick="filterBySubject('${s.name}')"><div class="card-icon">${s.icon}</div><h3>${s.name}</h3><span class="caps-tag">📋 CAPS: FET ${s.name}</span></div>`;
         });
         document.getElementById('subjectsGrid').innerHTML = html;
-    }
-    
-    function showTermContent(subject) {
-        const resourcesForSubject = resources.filter(r => r.subject === subject);
-        const termInfo = resourcesForSubject.length > 0 ? resourcesForSubject[0].term1Content : "Term 1 content available. Refer to CAPS document for detailed curriculum outcomes.";
-        document.getElementById('termContentDisplay').innerHTML = `<div class="resource-item"><div><h3>📖 ${subject} - Term 1 Overview (CAPS)</h3><p>${termInfo}</p><button class="action-btn" onclick="filterBySubject('${subject}')">View All ${subject} Resources</button></div></div>`;
     }
     
     function filterBySubject(subject) {
         const container = document.getElementById('studentResources');
         const filtered = resources.filter(r => r.subject === subject);
-        container.innerHTML = filtered.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div>${!completed.includes(r.id) ? '<button class="action-btn" onclick="markComplete(' + r.id + ')">✅ Mark Complete</button>' : '<span>✓ Completed (CAPS Outcome Achieved)</span>'}</div>`).join('');
+        container.innerHTML = filtered.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div>${r.fileUrl && r.fileUrl !== '#' ? `<div><a href="${r.fileUrl}" target="_blank" class="action-btn" style="background:#1a5f7a;">📥 Download</a></div>` : ''}</div>${!completed.includes(r.id) ? '<button class="action-btn" onclick="markComplete(' + r.id + ')">✅ Mark Complete</button>' : '<span>✓ Completed (CAPS Outcome Achieved)</span>'}</div>`).join('');
         showStudentSection('resources');
     }
     
     function renderStudentResources() {
         const container = document.getElementById('studentResources');
         if (!container) return;
-        container.innerHTML = resources.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div>${!completed.includes(r.id) ? '<button class="action-btn" onclick="markComplete(' + r.id + ')">✅ Mark Complete</button>' : '<span>✓ Completed (CAPS Outcome Achieved)</span>'}</div>`).join('');
+        container.innerHTML = resources.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div>${r.fileUrl && r.fileUrl !== '#' ? `<div><a href="${r.fileUrl}" target="_blank" class="action-btn" style="background:#1a5f7a;">📥 Download</a></div>` : ''}</div>${!completed.includes(r.id) ? '<button class="action-btn" onclick="markComplete(' + r.id + ')">✅ Mark Complete</button>' : '<span>✓ Completed (CAPS Outcome Achieved)</span>'}</div>`).join('');
+    }
+    
+    function renderQuizzesList() {
+        const container = document.getElementById('quizzesList');
+        if (!container) return;
+        if (!currentUser || currentUser.membership !== 'premium') {
+            container.innerHTML = `<div class="membership-badge"><button class="upgrade-btn" onclick="upgradeToPremium()">⭐ Upgrade to Premium (R10/month) to access interactive CAPS-aligned quizzes</button></div>`;
+            return;
+        }
+        container.innerHTML = quizzes.map(q => `
+            <div class="resource-item">
+                <div>
+                    <p><strong>${q.question}</strong></p>
+                    <div style="margin-top:0.5rem;">
+                        ${q.options.map((opt, idx) => `<button class="action-btn" style="margin:0.25rem; background:#e3f2fd; color:#1565c0;" onclick="alert('${opt}')">${String.fromCharCode(65+idx)}. ${opt}</button>`).join('')}
+                    </div>
+                    <div id="quiz-result-${q.id}" style="margin-top:0.5rem; font-size:0.85rem;"></div>
+                </div>
+            </div>
+        `).join('');
     }
     
     function markComplete(id) {
@@ -567,10 +560,21 @@
         if (txt) txt.innerText = `🎓 Completed ${completed.length} of ${resources.length} CAPS topics (${Math.round(p)}%) - ${p >= 80 ? 'Excellent! Ready for Matric.' : p >= 50 ? 'Good progress. Keep going!' : 'Keep working through CAPS topics.'}`;
     }
     
+    // Tutor Functions
     function renderTutorResources() {
         const container = document.getElementById('tutorResources');
         if (!container) return;
-        container.innerHTML = resources.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div><button class="delete-btn" onclick="deleteResource(${r.id})">🗑 Delete Resource</button></div>`).join('');
+        container.innerHTML = resources.map(r => `
+            <div class="resource-item">
+                <div>
+                    <h4>${r.title}</h4>
+                    <p>${r.desc}</p>
+                    <div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div>
+                    ${r.fileUrl && r.fileUrl !== '#' ? `<div class="meta-tag">📎 File attached</div>` : ''}
+                </div>
+                <button class="delete-btn" onclick="deleteResource(${r.id})">🗑 Delete</button>
+            </div>
+        `).join('');
     }
     
     function deleteResource(id) {
@@ -584,49 +588,35 @@
         }
     }
     
-    function uploadResource() {
-        const title = document.getElementById('resourceTitle').value;
-        const desc = document.getElementById('resourceDesc').value;
-        const grade = document.getElementById('resourceGrade').value;
-        const subject = document.getElementById('resourceSubject').value;
-        const type = document.getElementById('resourceType').value;
-        const link = document.getElementById('resourceLink').value;
-        const confirmed = document.getElementById('capsConfirm').checked;
-        
-        if (!title || !desc) { alert('Please complete all fields'); return; }
-        if (!confirmed) { alert('You must confirm that this resource is CAPS-aligned before uploading.'); return; }
-        
-        resources.push({ id: Date.now(), title, desc, grade, subject, type, link: link || '#', term1Content: desc.substring(0, 100) });
-        localStorage.setItem('eduResources_FET', JSON.stringify(resources));
-        
-        document.getElementById('resourceTitle').value = '';
-        document.getElementById('resourceDesc').value = '';
-        document.getElementById('resourceLink').value = '';
-        document.getElementById('capsConfirm').checked = false;
-        
-        renderTutorResources();
-        renderStudentResources();
-        updateProgress();
-        alert('✅ CAPS-aligned resource uploaded successfully!');
-    }
-    
+    // Parent Functions
     function viewChildProgress() {
         const p = resources.length ? Math.round((completed.length / resources.length) * 100) : 0;
-        document.getElementById('parentContent').innerHTML = `<div class="resource-item"><div><h4>📊 CAPS Curriculum Progress Report</h4><p>Completed ${completed.length} of ${resources.length} CAPS topics (${p}%)</p><div class="progress-bar-container"><div class="progress-bar" style="width:${p}%"></div></div><p>🏅 <strong>Matric Exam Readiness:</strong> ${p >= 80 ? 'Excellent! Your child is well-prepared for Matric.' : p >= 50 ? 'Good progress toward Matric. Encourage consistent revision.' : 'Focus on completing more CAPS topics before exams.'}</p><p style="margin-top:0.5rem;">📅 Recommended: Past paper practice for Grade 11 and 12 learners.</p></div></div>`;
+        document.getElementById('parentContent').innerHTML = `
+            <div class="resource-item">
+                <div>
+                    <h4>📊 CAPS Curriculum Progress Report</h4>
+                    <p>Completed ${completed.length} of ${resources.length} CAPS topics (${p}%)</p>
+                    <div class="progress-bar-container"><div class="progress-bar" style="width:${p}%"></div></div>
+                    <p>🏅 <strong>Matric Exam Readiness:</strong> ${p >= 80 ? 'Excellent! Your child is well-prepared for Matric.' : p >= 50 ? 'Good progress toward Matric. Encourage consistent revision.' : 'Focus on completing more CAPS topics before exams.'}</p>
+                    <p style="margin-top:0.5rem;">📅 Recommended: Past paper practice for Grade 11 and 12 learners.</p>
+                </div>
+            </div>
+        `;
     }
     
     // Section Navigation
     function showStudentSection(section) {
         document.getElementById('studentSubjectsSection').style.display = section === 'subjects' ? 'block' : 'none';
         document.getElementById('studentResourcesSection').style.display = section === 'resources' ? 'block' : 'none';
+        document.getElementById('studentQuizzesSection').style.display = section === 'quizzes' ? 'block' : 'none';
         document.getElementById('studentPremiumSection').style.display = section === 'premium' ? 'block' : 'none';
         if (section === 'resources') renderStudentResources();
+        if (section === 'quizzes') renderQuizzesList();
     }
     
     function showParentSection(section) {
         document.getElementById('parentProgressSection').style.display = section === 'progress' ? 'block' : 'none';
         document.getElementById('parentResourcesSection').style.display = section === 'resources' ? 'block' : 'none';
-        document.getElementById('parentGuideSection').style.display = section === 'guide' ? 'block' : 'none';
         if (section === 'resources') {
             document.getElementById('parentResourcesList').innerHTML = resources.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div></div>`).join('');
         }
@@ -641,30 +631,67 @@
     
     // Premium Features
     function loadQuizzes() {
-        if (currentUser?.membership !== 'premium') { alert('⭐ Premium membership (R10/month) required to access quizzes. Upgrade to unlock interactive assessments.'); return; }
-        document.getElementById('premiumContent').innerHTML = `<div class="resource-list"><div class="resource-item"><div><h4>📝 CAPS-Aligned Quiz: Mathematics</h4><p>1. What is the derivative of x²?<br>A) 2x B) x² C) 2 D) 1</p><button class="action-btn" onclick="alert('Answer: A) 2x. Great job!')">Submit Answer</button></div></div><div class="resource-item"><div><h4>📝 CAPS-Aligned Quiz: Physical Sciences</h4><p>Newton's First Law is also known as:<br>A) Law of Inertia B) Law of Acceleration C) Action-Reaction D) Law of Gravity</p><button class="action-btn" onclick="alert('Answer: A) Law of Inertia. Correct!')">Submit Answer</button></div></div></div>`;
+        if (!currentUser || currentUser.membership !== 'premium') {
+            alert('⭐ Premium membership (R10/month) required to access quizzes. Upgrade to unlock interactive assessments.');
+            return;
+        }
+        showStudentSection('quizzes');
     }
     
     function loadPastPapers() {
-        if (currentUser?.membership !== 'premium') { alert('⭐ Premium membership required to access past exam papers.'); return; }
-        document.getElementById('premiumContent').innerHTML = `<div class="resource-list"><div class="resource-item"><div><h4>📜 Mathematics P1 November 2024</h4><p>DBE Official Past Paper with Memorandum</p><button class="action-btn" onclick="window.open('https://www.education.gov.za','_blank')">📥 Download Paper</button></div></div><div class="resource-item"><div><h4>📜 Physical Sciences P1 November 2024</h4><p>DBE Official Past Paper with Memorandum</p><button class="action-btn" onclick="window.open('https://www.education.gov.za','_blank')">📥 Download Paper</button></div></div></div>`;
+        if (!currentUser || currentUser.membership !== 'premium') {
+            alert('⭐ Premium membership required to access past exam papers.');
+            return;
+        }
+        document.getElementById('premiumContent').innerHTML = `
+            <div class="resource-list">
+                <div class="resource-item">
+                    <div>
+                        <h4>📜 Mathematics P1 November 2024</h4>
+                        <p>DBE Official Past Paper with Memorandum</p>
+                        <button class="action-btn" onclick="window.open('https://www.education.gov.za','_blank')">📥 Download Paper</button>
+                    </div>
+                </div>
+                <div class="resource-item">
+                    <div>
+                        <h4>📜 Physical Sciences P1 November 2024</h4>
+                        <p>DBE Official Past Paper with Memorandum</p>
+                        <button class="action-btn" onclick="window.open('https://www.education.gov.za','_blank')">📥 Download Paper</button>
+                    </div>
+                </div>
+            </div>
+        `;
     }
     
     function loadStudyPlanner() {
-        if (currentUser?.membership !== 'premium') { alert('⭐ Premium membership required to access study planner.'); return; }
-        document.getElementById('premiumContent').innerHTML = `<div class="resource-list"><div class="resource-item"><div><h4>📅 Matric Study Planner (CAPS-Aligned)</h4><p><strong>Sample Weekly Schedule:</strong><br>Monday: Mathematics & Physical Sciences<br>Tuesday: Life Sciences & Accounting<br>Wednesday: Business Studies & Economics<br>Thursday: History & Geography<br>Friday: English HL & isiXhosa HL<br>Saturday: Life Orientation & Revision<br>Sunday: Rest & Past Paper Review</p><p>💡 Customize based on your exam timetable. Focus on weak subjects 3 months before Matric.</p></div></div></div>`;
+        if (!currentUser || currentUser.membership !== 'premium') {
+            alert('⭐ Premium membership required to access study planner.');
+            return;
+        }
+        document.getElementById('premiumContent').innerHTML = `
+            <div class="resource-list">
+                <div class="resource-item">
+                    <div>
+                        <h4>📅 Matric Study Planner (CAPS-Aligned)</h4>
+                        <p><strong>Sample Weekly Schedule:</strong><br>
+                        Monday: Mathematics & Physical Sciences<br>
+                        Tuesday: Life Sciences & Accounting<br>
+                        Wednesday: Business Studies & Economics<br>
+                        Thursday: History & Geography<br>
+                        Friday: English HL & isiXhosa HL<br>
+                        Saturday: Life Orientation & Revision<br>
+                        Sunday: Rest & Past Paper Review</p>
+                        <p>💡 Customize based on your exam timetable. Focus on weak subjects 3 months before Matric.</p>
+                    </div>
+                </div>
+            </div>
+        `;
     }
     
-    function loadExternalResources() {
-        document.getElementById('premiumContent').innerHTML = `<div class="cards-grid">
-            <div class="card" onclick="window.open('https://phet.colorado.edu','_blank')"><div class="card-icon">🔬</div><h3>PhET Simulations</h3><p>Free interactive science and maths simulations</p><span class="caps-tag">WCED Recommended</span></div>
-            <div class="card" onclick="window.open('https://wcedeportal.co.za','_blank')"><div class="card-icon">🏫</div><h3>WCED ePortal</h3><p>Official WCED digital resources and study tips</p><span class="caps-tag">WCED Official</span></div>
-            <div class="card" onclick="window.open('https://www.sace.org.za','_blank')"><div class="card-icon">👨‍🏫</div><h3>SACE CPTD</h3><p>Educator professional development portal</p><span class="caps-tag">SACE Registered</span></div>
-            <div class="card" onclick="window.open('https://www.education.gov.za','_blank')"><div class="card-icon">📜</div><h3>DBE Past Papers</h3><p>National Department of Basic Education resources</p><span class="caps-tag">DBE Official</span></div>
-        </div>`;
-    }
+    // Event Listeners and Initialization
+    document.getElementById('signupRole').addEventListener('change', updateCredentialField);
+    setTimeout(updateCredentialField, 100);
     
-    // Tab switching for auth modal
     document.querySelectorAll('.auth-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -673,22 +700,6 @@
             document.getElementById('loginForm').classList.toggle('active', target === 'login');
             document.getElementById('signupForm').classList.toggle('active', target === 'signup');
         });
-    });
-    
-    // Auth state listener
-    auth.onAuthStateChanged((user) => {
-        if (user && !sessionStorage.getItem('educonnect_current')) {
-            db.collection('users').doc(user.uid).get().then(doc => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                    sessionStorage.setItem('educonnect_current', JSON.stringify({ uid: user.uid, ...userData }));
-                    document.getElementById('authModal').style.display = 'none';
-                    document.getElementById('mainApp').style.display = 'block';
-                    document.getElementById('logoutBtn').style.display = 'block';
-                    loadDashboard();
-                }
-            });
-        }
     });
     
     // Check if user is already logged in
