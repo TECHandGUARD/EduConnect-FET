@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>EduConnect FET Phase | WCED & CAPS Aligned Grades 10-12</title>
+    <title>EduConnect FET | Interactive Learning Platform</title>
     <style>
         * {
             margin: 0;
@@ -18,6 +18,118 @@
             color: #333;
         }
 
+        /* Auth Modal */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 32px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #eef2f5;
+        }
+
+        .auth-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .auth-tab.active {
+            color: #1a5f7a;
+            border-bottom: 3px solid #1a5f7a;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-form input, .auth-form select {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+        }
+
+        .membership-badge {
+            background: #fef3c7;
+            padding: 1rem;
+            border-radius: 16px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .premium-only {
+            filter: blur(3px);
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .upgrade-btn {
+            background: linear-gradient(135deg, #f4c542, #e0a800);
+            color: #1a5f7a;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1a5f7a, #0d3b4f);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+            font-size: 0.8rem;
+        }
+
+        /* Header */
         .header {
             background: rgba(255,255,255,0.98);
             backdrop-filter: blur(10px);
@@ -44,11 +156,6 @@
             color: transparent;
         }
 
-        .logo p {
-            font-size: 0.7rem;
-            color: #666;
-        }
-
         .compliance-badge {
             display: flex;
             gap: 0.8rem;
@@ -62,29 +169,6 @@
             font-size: 0.7rem;
             font-weight: 600;
             color: #2e7d32;
-        }
-
-        .role-selector {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-
-        .role-btn {
-            padding: 0.5rem 1.2rem;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            background: #f0f0f0;
-            color: #666;
-        }
-
-        .role-btn.active {
-            background: linear-gradient(135deg, #1a5f7a, #0d3b4f);
-            color: white;
         }
 
         .container {
@@ -101,58 +185,12 @@
             display: block;
         }
 
-        .policy-banner {
-            background: linear-gradient(135deg, #1a5f7a, #0d3b4f);
-            border-radius: 20px;
-            padding: 1.5rem;
-            color: white;
-            margin-bottom: 2rem;
-        }
-
-        .policy-banner h3 {
-            margin-bottom: 0.5rem;
-        }
-
-        .policy-banner p {
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
-
-        .policy-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .policy-link {
-            background: rgba(255,255,255,0.2);
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            text-decoration: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        .welcome-banner {
-            background: white;
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .welcome-banner h2 {
-            color: #1a5f7a;
-            margin-bottom: 0.5rem;
-        }
-
+        /* Cards */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
+            margin: 2rem 0;
         }
 
         .card {
@@ -169,18 +207,13 @@
         }
 
         .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
         }
 
         .card h3 {
             color: #1a5f7a;
             margin-bottom: 0.5rem;
-        }
-
-        .card p {
-            color: #666;
-            font-size: 0.85rem;
         }
 
         .caps-tag {
@@ -190,55 +223,14 @@
             padding: 0.2rem 0.6rem;
             border-radius: 15px;
             font-size: 0.65rem;
-            margin-top: 0.8rem;
+            margin-top: 0.5rem;
         }
 
-        .upload-form {
-            background: white;
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .upload-form h3 {
-            color: #1a5f7a;
-            margin-bottom: 1rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-family: inherit;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #1a5f7a, #0d3b4f);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .resource-list {
+        .resource-list, .past-papers-list, .quiz-list {
             background: white;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin: 1rem 0;
         }
 
         .resource-item {
@@ -251,21 +243,52 @@
             gap: 1rem;
         }
 
-        .resource-info h4 {
-            color: #1a5f7a;
-            margin-bottom: 0.3rem;
+        .quiz-question {
+            background: #f8fafd;
+            padding: 1rem;
+            border-radius: 16px;
+            margin-bottom: 1rem;
         }
 
-        .resource-info p {
-            font-size: 0.8rem;
-            color: #666;
+        .quiz-option {
+            display: block;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: #eef2f5;
+            border-radius: 12px;
+            cursor: pointer;
         }
 
-        .resource-meta {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 0.5rem;
+        .quiz-option:hover {
+            background: #dce4ec;
+        }
+
+        .study-planner {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 1rem;
+        }
+
+        .calendar-day {
+            background: #eef2f5;
+            padding: 0.5rem;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .calendar-day.planned {
+            background: #1a5f7a;
+            color: white;
         }
 
         .meta-tag {
@@ -274,14 +297,8 @@
             padding: 0.2rem 0.6rem;
             border-radius: 15px;
             font-size: 0.65rem;
-        }
-
-        .caps-badge-small {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 0.2rem 0.6rem;
-            border-radius: 15px;
-            font-size: 0.65rem;
+            display: inline-block;
+            margin-right: 0.5rem;
         }
 
         .action-btn {
@@ -301,7 +318,6 @@
             padding: 0.4rem 1rem;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 0.8rem;
         }
 
         .progress-section {
@@ -326,6 +342,21 @@
             transition: width 0.5s;
         }
 
+        .welcome-banner {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-form input, .upload-form textarea, .upload-form select {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+        }
+
         .sace-footer {
             background: #1a1a2e;
             color: #aaa;
@@ -335,154 +366,391 @@
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            .header-top {
-                flex-direction: column;
-                text-align: center;
-            }
+            .container { padding: 1rem; }
+            .header-top { flex-direction: column; text-align: center; }
+            .cards-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="header-top">
-        <div class="logo">
-            <h1>📚 EduConnect FET Phase</h1>
-            <p>WCED & CAPS Aligned | FET Phase (Grades 10-12) | Matric Preparation</p>
+<!-- AUTH MODAL (Login/Signup) -->
+<div id="authModal" class="auth-modal">
+    <div class="auth-container">
+        <div class="auth-tabs">
+            <div class="auth-tab active" data-tab="login">Login</div>
+            <div class="auth-tab" data-tab="signup">Sign Up</div>
         </div>
-        <div class="compliance-badge">
-            <span class="badge">✅ CAPS Aligned</span>
-            <span class="badge">📋 WCED Approved Resources</span>
-            <span class="badge">👨‍🏫 SACE Registered</span>
-            <span class="badge">🏫 DBE Compliant</span>
-            <span class="badge">🎓 Matric Support</span>
+        
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form active">
+            <input type="email" id="loginEmail" placeholder="Email address" required>
+            <input type="password" id="loginPassword" placeholder="Password" required>
+            <select id="loginRole">
+                <option value="student">Student</option>
+                <option value="parent">Parent</option>
+                <option value="tutor">Tutor (SACE Registered)</option>
+            </select>
+            <button class="btn" onclick="handleLogin()">Login</button>
+            <div class="membership-badge" style="margin-top: 1rem;">
+                🎓 Membership: Free tier includes basic resources. <strong>Premium (R10/month)</strong> unlocks quizzes, past papers, study planner & unlimited access!
+            </div>
         </div>
-    </div>
-    <div class="role-selector">
-        <button class="role-btn active" data-role="student">👩‍🎓 Student</button>
-        <button class="role-btn" data-role="parent">👨‍👩‍👧 Parent</button>
-        <button class="role-btn" data-role="tutor">👨‍🏫 Tutor (SACE Registered)</button>
+        
+        <!-- Signup Form -->
+        <div id="signupForm" class="auth-form">
+            <input type="text" id="signupName" placeholder="Full Name" required>
+            <input type="email" id="signupEmail" placeholder="Email address" required>
+            <input type="password" id="signupPassword" placeholder="Password (min 6 characters)" required>
+            <select id="signupRole">
+                <option value="student">Student</option>
+                <option value="parent">Parent</option>
+                <option value="tutor">Tutor (SACE Registered)</option>
+            </select>
+            <select id="signupMembership">
+                <option value="free">Free Tier (Limited Access)</option>
+                <option value="premium">Premium (R10/month - Full Access)</option>
+            </select>
+            <button class="btn" onclick="handleSignup()">Create Account</button>
+            <p style="font-size:0.7rem; text-align:center; margin-top:1rem;">⭐ Premium membership (R10/month): Quizzes, Past Papers, Study Planner, Unlimited resources</p>
+        </div>
     </div>
 </div>
 
-<div class="container">
-    <div class="policy-banner">
-        <h3>📜 Official Compliance Statement</h3>
-        <p>This platform operates in full alignment with the Western Cape Education Department (WCED) ePortal framework, the Curriculum and Assessment Policy Statement (CAPS) for FET Phase (Grades 10-12), and the South African Council for Educators (SACE) professional standards. All resources support learners preparing for the National Senior Certificate (Matric) examinations.</p>
-        <div class="policy-links">
-            <a class="policy-link" onclick="showPolicy('caps')">📖 CAPS Document</a>
-            <a class="policy-link" onclick="showPolicy('wced')">🏫 WCED Framework</a>
-            <a class="policy-link" onclick="showPolicy('sace')">👨‍🏫 SACE Code of Conduct</a>
-            <a class="policy-link" onclick="showPolicy('dbe')">🇿🇦 DBE Policies</a>
+<!-- Logout Button (hidden initially) -->
+<button id="logoutBtn" class="logout-btn" style="display:none;" onclick="logout()">🚪 Logout</button>
+
+<div id="mainApp" style="display:none;">
+    <div class="header">
+        <div class="header-top">
+            <div class="logo"><h1>📚 EduConnect FET Phase</h1><p>WCED & CAPS Aligned | FET Phase (Grades 10-12)</p></div>
+            <div class="compliance-badge">
+                <span class="badge">✅ CAPS Aligned</span>
+                <span class="badge">📋 WCED Approved</span>
+                <span class="badge">👨‍🏫 SACE Registered</span>
+                <span class="badge">🎓 Matric Support</span>
+            </div>
         </div>
+        <div id="userInfo" style="text-align:right; font-size:0.8rem; margin-top:0.5rem;"></div>
     </div>
 
-    <div id="studentDashboard" class="dashboard active">
-        <div class="welcome-banner">
-            <h2>📖 Welcome, FET Phase Learner!</h2>
-            <p>Your learning journey is aligned with the <strong>CAPS curriculum for Grades 10-12</strong>. Master your subjects, track progress, and prepare for your Matric exams.</p>
+    <div class="container">
+        <!-- Student Dashboard -->
+        <div id="studentDashboard" class="dashboard active">
+            <div class="welcome-banner">
+                <h2>📖 Welcome, <span id="studentName"></span>!</h2>
+                <p>CAPS-aligned learning for Grades 10-12. Track your Matric preparation.</p>
+                <div id="membershipAlert"></div>
+            </div>
+            
+            <div class="cards-grid">
+                <div class="card" onclick="filterBySubject('Mathematics')"><div class="card-icon">🔢</div><h3>Mathematics</h3><span class="caps-tag">CAPS: FET Maths</span></div>
+                <div class="card" onclick="filterBySubject('Physical Sciences')"><div class="card-icon">⚛️</div><h3>Physical Sciences</h3><span class="caps-tag">CAPS: FET Sciences</span></div>
+                <div class="card" onclick="filterBySubject('Life Sciences')"><div class="card-icon">🧬</div><h3>Life Sciences</h3><span class="caps-tag">CAPS: FET Biology</span></div>
+                <div class="card" onclick="filterBySubject('Accounting')"><div class="card-icon">📊</div><h3>Accounting</h3><span class="caps-tag">CAPS: FET Accounting</span></div>
+            </div>
+            
+            <div id="studentResources" class="resource-list"></div>
+            
+            <!-- Premium Features (Visible to Premium users) -->
+            <div id="premiumSection" style="display:none;">
+                <h3>🎓 Premium Features (R10/month — Unlocked)</h3>
+                <div class="cards-grid">
+                    <div class="card" onclick="showQuizzes()"><div class="card-icon">📝</div><h3>Gamified Quizzes</h3><p>Test your knowledge with interactive quizzes</p></div>
+                    <div class="card" onclick="showPastPapers()"><div class="card-icon">📜</div><h3>Past Exam Papers</h3><p>DBE official Matric papers & memos</p></div>
+                    <div class="card" onclick="showStudyPlanner()"><div class="card-icon">📅</div><h3>Study Planner</h3><p>Personalized study schedule</p></div>
+                    <div class="card" onclick="showExternalResources()"><div class="card-icon">🌐</div><h3>External Resources</h3><p>PhET, WCED, SACE CPTD</p></div>
+                </div>
+                <div id="premiumContent"></div>
+            </div>
+            
+            <div class="progress-section">
+                <h3>📊 Matric Progress</h3>
+                <div class="progress-bar-container"><div class="progress-bar" id="studentProgress"></div></div>
+                <p id="progressText"></p>
+            </div>
         </div>
-        <div class="cards-grid">
-            <div class="card" onclick="filterBySubject('Mathematics')"><div class="card-icon">🔢</div><h3>Mathematics</h3><p>Algebra, calculus, geometry, trigonometry, functions, probability, and statistics.</p><span class="caps-tag">📋 CAPS: FET Mathematics</span></div>
-            <div class="card" onclick="filterBySubject('Physical Sciences')"><div class="card-icon">⚛️</div><h3>Physical Sciences</h3><p>Physics (mechanics, electricity, optics) and Chemistry (stoichiometry, organic, reactions).</p><span class="caps-tag">📋 CAPS: FET Physical Sciences</span></div>
-            <div class="card" onclick="filterBySubject('Life Sciences')"><div class="card-icon">🧬</div><h3>Life Sciences</h3><p>Biology, human anatomy, genetics, evolution, ecology, and practical investigations.</p><span class="caps-tag">📋 CAPS: FET Life Sciences</span></div>
-            <div class="card" onclick="filterBySubject('Accounting')"><div class="card-icon">📊</div><h3>Accounting</h3><p>Financial accounting, management accounting, auditing, and tax basics.</p><span class="caps-tag">📋 CAPS: FET Accounting</span></div>
-            <div class="card" onclick="filterBySubject('Business Studies')"><div class="card-icon">🏢</div><h3>Business Studies</h3><p>Business environments, functions, strategies, entrepreneurship, and ethics.</p><span class="caps-tag">📋 CAPS: FET Business Studies</span></div>
-            <div class="card" onclick="filterBySubject('Economics')"><div class="card-icon">💰</div><h3>Economics</h3><p>Microeconomics, macroeconomics, economic systems, growth, and development.</p><span class="caps-tag">📋 CAPS: FET Economics</span></div>
-            <div class="card" onclick="filterBySubject('History')"><div class="card-icon">🏛️</div><h3>History</h3><p>World history, South African history, essay writing, and source-based questions.</p><span class="caps-tag">📋 CAPS: FET History</span></div>
-            <div class="card" onclick="filterBySubject('Geography')"><div class="card-icon">🌍</div><h3>Geography</h3><p>Climatology, geomorphology, population, settlement, GIS, and mapwork.</p><span class="caps-tag">📋 CAPS: FET Geography</span></div>
-            <div class="card" onclick="filterBySubject('English HL')"><div class="card-icon">📖</div><h3>English Home Language</h3><p>Literature (poetry, novels, drama), creative writing, comprehension, and language.</p><span class="caps-tag">📋 CAPS: FET English HL</span></div>
-            <div class="card" onclick="filterBySubject('Life Orientation')"><div class="card-icon">🌟</div><h3>Life Orientation</h3><p>Personal well-being, citizenship, health, career guidance, and study skills for FET.</p><span class="caps-tag">📋 CAPS: FET Life Orientation</span></div>
+        
+        <!-- Parent Dashboard -->
+        <div id="parentDashboard" class="dashboard">
+            <div class="welcome-banner">
+                <h2>🏠 Welcome, Parent <span id="parentName"></span>!</h2>
+                <p>Monitor your child's FET Phase progress</p>
+            </div>
+            <div id="parentContent" class="resource-list"></div>
+            <button class="btn" onclick="viewChildProgress()" style="margin-top:1rem;">View Child's Progress</button>
         </div>
-        <div id="studentResources" class="resource-list"></div>
-        <div class="progress-section">
-            <h3>📊 Your Matric Preparation Progress</h3>
-            <div class="progress-bar-container"><div class="progress-bar" id="studentProgress"></div></div>
-            <p id="progressText">Complete CAPS-aligned lessons to track your Matric readiness!</p>
+        
+        <!-- Tutor Dashboard -->
+        <div id="tutorDashboard" class="dashboard">
+            <div class="welcome-banner">
+                <h2>👨‍🏫 Welcome, Tutor <span id="tutorName"></span>!</h2>
+                <p>SACE-Registered professionals can upload CAPS-aligned content</p>
+            </div>
+            <div class="upload-form" style="background:white; border-radius:20px; padding:1.5rem; margin-bottom:1rem;">
+                <h3>Upload Resource</h3>
+                <input type="text" id="resourceTitle" placeholder="Title">
+                <textarea id="resourceDesc" placeholder="Description" rows="3"></textarea>
+                <select id="resourceGrade">
+                    <option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+                </select>
+                <select id="resourceSubject">
+                    <option>Mathematics</option><option>Physical Sciences</option><option>Life Sciences</option><option>Accounting</option>
+                </select>
+                <button class="btn" onclick="uploadResource()">➕ Upload Resource</button>
+            </div>
+            <div id="tutorResources" class="resource-list"></div>
         </div>
     </div>
-
-    <div id="parentDashboard" class="dashboard">
-        <div class="welcome-banner"><h2>🏠 Welcome, Parent / Guardian!</h2><p>Support your teen's Matric journey. Monitor progress across all Grade 10-12 subjects.</p></div>
-        <div class="cards-grid">
-            <div class="card" onclick="showChildProgress()"><div class="card-icon">📈</div><h3>Academic Progress Report</h3><p>Track your child's completion of FET Phase curriculum topics.</p></div>
-            <div class="card" onclick="showAllResources()"><div class="card-icon">📚</div><h3>WCED Resource Library</h3><p>Access all CAPS-aligned materials for Grades 10-12.</p></div>
-            <div class="card" onclick="showParentGuide()"><div class="card-icon">💡</div><h3>Parent Support Guide</h3><p>Tips for supporting Matric learners during exam season.</p></div>
-        </div>
-        <div id="parentContent" class="resource-list"></div>
+    <div class="sace-footer">
+        <p>EduConnect FET Phase — WCED | CAPS | SACE Code of Ethics</p>
+        <p>© 2025 EduConnect | Matric Exam Preparation | Premium: R10/month</p>
     </div>
-
-    <div id="tutorDashboard" class="dashboard">
-        <div class="welcome-banner"><h2>👨‍🏫 Welcome, SACE-Registered Tutor!</h2><p>Share CAPS-aligned FET Phase (Grades 10-12) content and support Matric exam preparation.</p></div>
-        <div class="upload-form">
-            <h3>📤 Upload CAPS-Aligned FET Phase Content</h3>
-            <div class="form-group"><input type="text" id="resourceTitle" placeholder="Resource Title (CAPS Topic)"></div>
-            <div class="form-group"><textarea id="resourceDesc" placeholder="Description — specify CAPS learning outcomes and Matric exam relevance..."></textarea></div>
-            <div class="form-group"><select id="resourceGrade"><option value="Grade 10">Grade 10 (FET Phase)</option><option value="Grade 11">Grade 11 (FET Phase)</option><option value="Grade 12">Grade 12 (FET Phase / Matric)</option></select></div>
-            <div class="form-group"><select id="resourceSubject"><option value="Mathematics">Mathematics</option><option value="Physical Sciences">Physical Sciences</option><option value="Life Sciences">Life Sciences</option><option value="Accounting">Accounting</option><option value="Business Studies">Business Studies</option><option value="Economics">Economics</option><option value="History">History</option><option value="Geography">Geography</option><option value="English HL">English Home Language</option><option value="Life Orientation">Life Orientation</option></select></div>
-            <div class="form-group"><select id="resourceType"><option value="Notes">📝 Study Notes</option><option value="Slides">📊 Lesson Slides</option><option value="Assignment">✏️ CAPS Assessment Task</option><option value="Past Paper">📜 Past Exam Paper</option><option value="Memo">✅ Memo/Answer Guide</option></select></div>
-            <div class="form-group"><label style="display:flex; align-items:center; gap:0.5rem;"><input type="checkbox" id="capsConfirm"> ✅ I confirm this resource is CAPS-aligned for FET Phase (Grades 10-12)</label></div>
-            <button class="btn" onclick="uploadResource()">➕ Upload Resource (CAPS Aligned | FET)</button>
-        </div>
-        <div id="tutorResources" class="resource-list"></div>
-        <div class="progress-section"><h3>👨‍🏫 SACE Professional Commitment</h3><p>By uploading resources, you affirm all materials are curriculum-aligned and appropriate for learners aged 15-18 preparing for the National Senior Certificate.</p></div>
-    </div>
-</div>
-
-<div class="sace-footer">
-    <p>📚 EduConnect FET Phase — Aligned with <strong>WCED ePortal</strong>, <strong>CAPS Grades 10-12</strong>, and <strong>SACE Code of Ethics</strong>. Supporting learners on their journey to the National Senior Certificate (Matric).</p>
-    <p style="margin-top: 0.8rem;">© 2025 EduConnect | FET Phase (Grades 10-12) | WCED Alignment | CAPS Curriculum | Matric Exam Preparation</p>
 </div>
 
 <script>
+    // Users database
+    let users = JSON.parse(localStorage.getItem('educonnect_users')) || [];
+    let currentUser = JSON.parse(sessionStorage.getItem('educonnect_current')) || null;
+    
+    // Resources
     let resources = JSON.parse(localStorage.getItem('eduResources_FET')) || [];
-    if (resources.length === 0) {
+    if(resources.length === 0){
         resources = [
-            { id: 1, title: "Calculus: Differentiation", desc: "First principles, rules of differentiation, and applications (CAPS FET Mathematics)", grade: "Grade 12", subject: "Mathematics", type: "Notes", capsTopic: "Calculus", uploadedBy: "SACE Tutor" },
-            { id: 2, title: "Newton's Laws of Motion", desc: "Physics - mechanics for Grade 11 Physical Sciences", grade: "Grade 11", subject: "Physical Sciences", type: "Slides", capsTopic: "Mechanics", uploadedBy: "SACE Tutor" },
-            { id: 3, title: "The Great Gatsby - Essay Guide", desc: "Literature essay writing for English HL", grade: "Grade 11", subject: "English HL", type: "Notes", capsTopic: "Literature", uploadedBy: "SACE Tutor" },
-            { id: 4, title: "Accounting: Ledger Accounts", desc: "Step-by-step guide to posting to ledgers and trial balances", grade: "Grade 10", subject: "Accounting", type: "Worksheet", capsTopic: "Financial Accounting", uploadedBy: "SACE Tutor" },
-            { id: 5, title: "Mathematics P1 Nov 2024 Paper", desc: "National Senior Certificate past exam paper with memo", grade: "Grade 12", subject: "Mathematics", type: "Past Paper", capsTopic: "Exam Preparation", uploadedBy: "SACE Tutor" },
-            { id: 6, title: "Human Reproduction", desc: "Life Sciences - male and female reproductive systems", grade: "Grade 12", subject: "Life Sciences", type: "Notes", capsTopic: "Life Processes", uploadedBy: "SACE Tutor" }
+            { id: 1, title: "Calculus: Differentiation", desc: "First principles and rules of differentiation (CAPS FET Mathematics)", grade: "Grade 12", subject: "Mathematics" },
+            { id: 2, title: "Newton's Laws of Motion", desc: "Physics mechanics for Grade 11 Physical Sciences", grade: "Grade 11", subject: "Physical Sciences" },
+            { id: 3, title: "Human Reproduction", desc: "Life Sciences - male and female reproductive systems", grade: "Grade 12", subject: "Life Sciences" },
+            { id: 4, title: "Accounting: Ledger Accounts", desc: "Step-by-step guide to posting to ledgers", grade: "Grade 10", subject: "Accounting" }
         ];
-        saveResources();
+        localStorage.setItem('eduResources_FET', JSON.stringify(resources));
     }
-    function saveResources() { localStorage.setItem('eduResources_FET', JSON.stringify(resources)); }
+    
     let completed = JSON.parse(localStorage.getItem('eduCompleted_FET')) || [];
-    function markComplete(id) { if(!completed.includes(id)){ completed.push(id); localStorage.setItem('eduCompleted_FET', JSON.stringify(completed)); renderStudentResources(); updateProgress(); } }
-    function updateProgress() { let p = resources.length>0 ? (completed.length/resources.length)*100 : 0; let bar = document.getElementById('studentProgress'); let txt = document.getElementById('progressText'); if(bar) bar.style.width = p+'%'; if(txt) txt.innerText = `🎓 Completed ${completed.length} of ${resources.length} FET Phase CAPS topics!`; }
-    let currentFilter = 'All';
-    function filterBySubject(s) { currentFilter = s; renderStudentResources(); }
-    function renderStudentResources() {
-        let container = document.getElementById('studentResources'); if(!container) return;
-        let filtered = currentFilter=='All' ? resources : resources.filter(r=>r.subject===currentFilter);
-        if(filtered.length===0){ container.innerHTML='<div class="resource-item"><p>No resources found for this subject. Check back for new FET Phase content!</p></div>'; return; }
-        container.innerHTML = filtered.map(res => `<div class="resource-item"><div class="resource-info"><h4>${res.title}</h4><p>${res.desc}</p><div class="resource-meta"><span class="meta-tag">${res.grade}</span><span class="meta-tag">${res.subject}</span><span class="meta-tag">${res.type}</span><span class="caps-badge-small">📋 CAPS: ${res.capsTopic}</span></div></div>${!completed.includes(res.id)?`<button class="action-btn" onclick="markComplete(${res.id})">✅ Mark Complete</button>`:'<span style="color:#10b981;">✓ Completed (Matric Ready)</span>'}</div>`).join('');
+    
+    // Premium features data
+    let quizzes = [
+        { id: 1, subject: "Mathematics", question: "What is the derivative of x²?", options: ["2x", "x²", "2", "1"], answer: 0 },
+        { id: 2, subject: "Physical Sciences", question: "Newton's First Law is also known as:", options: ["Law of Inertia", "Law of Acceleration", "Action-Reaction", "Law of Gravity"], answer: 0 },
+        { id: 3, subject: "Life Sciences", question: "Which organ produces insulin?", options: ["Liver", "Pancreas", "Kidney", "Heart"], answer: 1 }
+    ];
+    
+    let pastPapers = [
+        { id: 1, subject: "Mathematics", year: "2024", title: "Mathematics P1 Nov 2024", link: "https://www.education.gov.za/ExamPapers.aspx" },
+        { id: 2, subject: "Physical Sciences", year: "2024", title: "Physics P1 Nov 2024", link: "https://www.education.gov.za/ExamPapers.aspx" },
+        { id: 3, subject: "Life Sciences", year: "2024", title: "Life Sciences P1 Nov 2024", link: "https://www.education.gov.za/ExamPapers.aspx" }
+    ];
+    
+    // Payment simulation (R10)
+    function processPayment(plan) {
+        alert(`⚡ Payment gateway integration: ${plan} membership (R10/month).\n\nIn production, this would connect to PayFast/Yoco.\nRedirecting to secure checkout...`);
+        if(plan === 'premium'){
+            if(currentUser){
+                currentUser.membership = 'premium';
+                sessionStorage.setItem('educonnect_current', JSON.stringify(currentUser));
+                let userIndex = users.findIndex(u => u.email === currentUser.email);
+                if(userIndex !== -1){ 
+                    users[userIndex].membership = 'premium'; 
+                    localStorage.setItem('educonnect_users', JSON.stringify(users)); 
+                }
+                alert('✅ Premium membership activated! Refresh to access all features.');
+                location.reload();
+            }
+        }
     }
-    function renderTutorResources() {
-        let container = document.getElementById('tutorResources'); if(!container) return;
-        if(resources.length===0){ container.innerHTML='<div class="resource-item"><p>No resources yet. Upload FET Phase content above.</p></div>'; return; }
-        container.innerHTML = resources.map(res => `<div class="resource-item"><div class="resource-info"><h4>${res.title}</h4><p>${res.desc}</p><div class="resource-meta"><span class="meta-tag">${res.grade}</span><span class="meta-tag">${res.subject}</span><span class="caps-badge-small">CAPS: ${res.capsTopic}</span></div></div><button class="delete-btn" onclick="deleteResource(${res.id})">🗑 Remove</button></div>`).join('');
+    
+    // Auth functions
+    function handleSignup(){
+        let name = document.getElementById('signupName').value;
+        let email = document.getElementById('signupEmail').value;
+        let pwd = document.getElementById('signupPassword').value;
+        let role = document.getElementById('signupRole').value;
+        let membership = document.getElementById('signupMembership').value;
+        
+        if(!name || !email || !pwd){ alert('Please fill all fields'); return; }
+        if(users.find(u => u.email === email)){ alert('User already exists'); return; }
+        if(pwd.length < 6){ alert('Password must be at least 6 characters'); return; }
+        
+        let newUser = { name, email, pwd, role, membership, completed: [], uploaded: [] };
+        users.push(newUser);
+        localStorage.setItem('educonnect_users', JSON.stringify(users));
+        alert('Account created successfully! Please login.');
+        document.querySelector('.auth-tab[data-tab="login"]').click();
     }
-    function deleteResource(id) { if(confirm('Delete this FET Phase resource?')){ resources=resources.filter(r=>r.id!==id); saveResources(); renderTutorResources(); renderStudentResources(); updateProgress(); } }
-    function uploadResource() {
-        let title=document.getElementById('resourceTitle').value, desc=document.getElementById('resourceDesc').value, grade=document.getElementById('resourceGrade').value, subject=document.getElementById('resourceSubject').value, type=document.getElementById('resourceType').value, confirmed=document.getElementById('capsConfirm').checked;
-        if(!title||!desc){ alert('Please complete all fields'); return; }
-        if(!confirmed){ alert('You must confirm CAPS alignment for FET Phase'); return; }
-        let capsMap = { 'Mathematics':'Calculus/Algebra', 'Physical Sciences':'Physics/Chemistry', 'Life Sciences':'Life Processes', 'Accounting':'Financial Accounting', 'Business Studies':'Business Environments', 'Economics':'Macroeconomics', 'History':'World/SA History', 'Geography':'Climatology/Geomorphology', 'English HL':'Literature/Language', 'Life Orientation':'Personal Well-being' };
-        resources.push({ id:Date.now(), title, desc, grade, subject, type, capsTopic:capsMap[subject]||'FET CAPS Topic', uploadedBy:'SACE Tutor' });
-        saveResources(); document.getElementById('resourceTitle').value=''; document.getElementById('resourceDesc').value=''; document.getElementById('capsConfirm').checked=false;
-        renderTutorResources(); alert('✅ FET Phase resource uploaded successfully! Supporting Matric preparation.');
+    
+    function handleLogin(){
+        let email = document.getElementById('loginEmail').value;
+        let pwd = document.getElementById('loginPassword').value;
+        let role = document.getElementById('loginRole').value;
+        let user = users.find(u => u.email === email && u.pwd === pwd && u.role === role);
+        if(!user){ alert('Invalid credentials or role mismatch'); return; }
+        currentUser = user;
+        sessionStorage.setItem('educonnect_current', JSON.stringify(currentUser));
+        document.getElementById('authModal').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'block';
+        loadDashboard();
     }
-    function showChildProgress() { let parent=document.getElementById('parentContent'); let percent=resources.length?Math.round((completed.length/resources.length)*100):0; parent.innerHTML=`<div class="resource-item"><div class="resource-info"><h4>📊 FET Phase / Matric Progress Report</h4><p>Completed: ${completed.length} of ${resources.length} CAPS topics (${percent}%)</p><div class="progress-bar-container"><div class="progress-bar" style="width:${percent}%;"></div></div><p>🏅 <strong>Matric Exam Readiness:</strong> ${percent>=80?'Excellent!':percent>=50?'Good progress':'Focus on completing more CAPS topics'}</p></div></div>`; }
-    function showAllResources() { let parent=document.getElementById('parentContent'); if(resources.length===0){ parent.innerHTML='<div class="resource-item"><p>No FET Phase resources yet.</p></div>'; return; } parent.innerHTML=resources.map(res=>`<div class="resource-item"><div class="resource-info"><h4>${res.title}</h4><p>${res.desc}</p><div class="resource-meta"><span class="meta-tag">${res.grade}</span><span class="meta-tag">${res.subject}</span><span class="caps-badge-small">CAPS: ${res.capsTopic}</span></div></div><button class="action-btn" onclick="alert('📥 Accessing FET Phase resource: ${res.title}')">📥 Access Resource</button></div>`).join(''); }
-    function showParentGuide() { document.getElementById('parentContent').innerHTML=`<div class="resource-item"><div class="resource-info"><h4>💡 Supporting FET Phase Learners (Grades 10-12)</h4><ul style="margin-left:1.5rem;"><li>Create a structured study schedule (2-3 hours daily for Grade 12)</li><li>Encourage past paper practice 3 months before Matric exams</li><li>Help identify weak subjects and focus on them</li><li>Manage exam stress with breaks and good sleep</li></ul><p style="margin-top:1rem;">🎓 <strong>Matric Exam Tips:</strong> Start revision early, practice time management, and review marking guidelines.</p></div></div>`; }
-    function showPolicy(t) { let msgs={'caps':'📖 CAPS for FET Phase (Grades 10-12) includes subject guidelines and exam specifications for Matric.','wced':'🏫 WCED ePortal provides digital resources and past papers for Matric learners.','sace':'👨‍🏫 SACE Code requires tutors to maintain professional ethics.','dbe':'🇿🇦 DBE policies emphasize quality education and Matric exam preparation.'}; alert(msgs[t]||'FET Phase policy info'); }
-    document.querySelectorAll('.role-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); let role=btn.getAttribute('data-role'); document.getElementById('studentDashboard').classList.remove('active'); document.getElementById('parentDashboard').classList.remove('active'); document.getElementById('tutorDashboard').classList.remove('active'); document.getElementById(role+'Dashboard').classList.add('active'); if(role==='student'){ renderStudentResources(); updateProgress(); } else if(role==='tutor') renderTutorResources(); else if(role==='parent') showChildProgress(); }); });
-    renderStudentResources(); updateProgress(); renderTutorResources();
+    
+    function logout(){
+        sessionStorage.removeItem('educonnect_current');
+        location.reload();
+    }
+    
+    function loadDashboard(){
+        document.querySelectorAll('.dashboard').forEach(d => d.classList.remove('active'));
+        if(currentUser.role === 'student'){
+            document.getElementById('studentDashboard').classList.add('active');
+            document.getElementById('studentName').innerText = currentUser.name;
+            if(currentUser.membership === 'premium'){
+                document.getElementById('premiumSection').style.display = 'block';
+                document.getElementById('membershipAlert').innerHTML = '<span style="background:#d4edda; padding:0.5rem 1rem; border-radius:20px; display:inline-block;">⭐ Premium Member (R10/month) - Full Access</span>';
+            } else {
+                document.getElementById('premiumSection').style.display = 'none';
+                document.getElementById('membershipAlert').innerHTML = '<button class="upgrade-btn" onclick="processPayment(\'premium\')">⭐ Upgrade to Premium (R10/month) → Unlock Quizzes, Past Papers & Study Planner</button>';
+            }
+            renderStudentResources();
+            updateProgress();
+        } else if(currentUser.role === 'parent'){
+            document.getElementById('parentDashboard').classList.add('active');
+            document.getElementById('parentName').innerText = currentUser.name;
+            viewChildProgress();
+        } else {
+            document.getElementById('tutorDashboard').classList.add('active');
+            document.getElementById('tutorName').innerText = currentUser.name;
+            renderTutorResources();
+        }
+    }
+    
+    function renderStudentResources(){
+        let container = document.getElementById('studentResources');
+        if(!container) return;
+        container.innerHTML = resources.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div>${!completed.includes(r.id) ? '<button class="action-btn" onclick="markComplete(' + r.id + ')">✅ Mark Complete</button>' : '<span>✓ Completed</span>'}</div>`).join('');
+    }
+    
+    function markComplete(id){ 
+        if(!completed.includes(id)){ 
+            completed.push(id); 
+            localStorage.setItem('eduCompleted_FET', JSON.stringify(completed)); 
+            renderStudentResources(); 
+            updateProgress(); 
+        } 
+    }
+    
+    function updateProgress(){ 
+        let p = resources.length ? (completed.length / resources.length) * 100 : 0; 
+        let bar = document.getElementById('studentProgress'); 
+        if(bar) bar.style.width = p + '%'; 
+        let txt = document.getElementById('progressText');
+        if(txt) txt.innerText = `🎓 Completed ${completed.length} of ${resources.length} CAPS topics!`;
+    }
+    
+    function filterBySubject(s){ 
+        let container = document.getElementById('studentResources');
+        let filtered = resources.filter(r => r.subject === s);
+        container.innerHTML = filtered.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div>${!completed.includes(r.id) ? '<button class="action-btn" onclick="markComplete(' + r.id + ')">✅ Mark Complete</button>' : '<span>✓ Completed</span>'}</div>`).join('');
+    }
+    
+    function renderTutorResources(){
+        let container = document.getElementById('tutorResources');
+        if(!container) return;
+        container.innerHTML = resources.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div><button class="delete-btn" onclick="deleteResource(${r.id})">🗑 Delete</button></div>`).join('');
+    }
+    
+    function deleteResource(id){ 
+        resources = resources.filter(r => r.id !== id); 
+        localStorage.setItem('eduResources_FET', JSON.stringify(resources)); 
+        renderTutorResources(); 
+        renderStudentResources(); 
+        updateProgress(); 
+    }
+    
+    function uploadResource(){ 
+        let title = document.getElementById('resourceTitle').value; 
+        let desc = document.getElementById('resourceDesc').value; 
+        let grade = document.getElementById('resourceGrade').value; 
+        let subject = document.getElementById('resourceSubject').value; 
+        if(!title || !desc){ alert('Please complete all fields'); return; } 
+        resources.push({ id: Date.now(), title, desc, grade, subject }); 
+        localStorage.setItem('eduResources_FET', JSON.stringify(resources)); 
+        renderTutorResources(); 
+        document.getElementById('resourceTitle').value = ''; 
+        document.getElementById('resourceDesc').value = ''; 
+        alert('✅ Resource uploaded successfully!'); 
+    }
+    
+    function viewChildProgress(){ 
+        let percent = resources.length ? Math.round((completed.length / resources.length) * 100) : 0;
+        document.getElementById('parentContent').innerHTML = `<div class="resource-item"><div><h4>📊 Progress Report</h4><p>Completed ${completed.length} of ${resources.length} topics (${percent}%)</p><div class="progress-bar-container"><div class="progress-bar" style="width:${percent}%"></div></div><p>🏅 Matric Readiness: ${percent >= 80 ? 'Excellent!' : percent >= 50 ? 'Good progress' : 'Encourage daily study'}</p></div></div>`;
+    }
+    
+    // Premium features
+    function showQuizzes(){
+        if(currentUser.membership !== 'premium'){ alert('⭐ Premium membership (R10/month) required to access quizzes. Upgrade now!'); return; }
+        let html = '<h3>📝 Gamified Quizzes</h3>';
+        quizzes.forEach(q => { 
+            html += `<div class="quiz-question"><strong>${q.question}</strong>`; 
+            q.options.forEach((opt, idx) => { 
+                html += `<div class="quiz-option" onclick="checkQuizAnswer(${q.id}, ${idx})">${opt}</div>`; 
+            }); 
+            html += `<div id="quizResult-${q.id}" style="margin-top:0.5rem;"></div></div>`; 
+        });
+        document.getElementById('premiumContent').innerHTML = html;
+        document.getElementById('premiumContent').scrollIntoView();
+    }
+    
+    function checkQuizAnswer(qId, selected){ 
+        let q = quizzes.find(q => q.id === qId); 
+        if(selected === q.answer){ 
+            document.getElementById(`quizResult-${qId}`).innerHTML = '<span style="color:#10b981;">✅ Correct! Well done!</span>'; 
+        } else { 
+            document.getElementById(`quizResult-${qId}`).innerHTML = '<span style="color:#ef4444;">❌ Try again!</span>'; 
+        } 
+    }
+    
+    function showPastPapers(){
+        if(currentUser.membership !== 'premium'){ alert('⭐ Premium membership (R10/month) required to access past papers.'); return; }
+        let html = '<h3>📜 DBE Past Exam Papers</h3>';
+        pastPapers.forEach(p => { 
+            html += `<div class="resource-item"><div><h4>${p.title} (${p.year})</h4><p>${p.subject}</p></div><button class="action-btn" onclick="window.open('${p.link}','_blank')">📥 Download Paper</button></div>`; 
+        });
+        document.getElementById('premiumContent').innerHTML = html;
+    }
+    
+    function showStudyPlanner(){
+        if(currentUser.membership !== 'premium'){ alert('⭐ Premium membership (R10/month) required to access study planner.'); return; }
+        let days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        let html = `<div class="study-planner"><h3>📅 Personalized Study Planner</h3><div class="calendar-grid">${days.map(d => `<div class="calendar-day">${d.substring(0,3)}</div>`).join('')}</div><p style="margin-top:1rem;">📌 Premium feature: Plan your study schedule for Matric success.</p><p>💡 Tip: Focus on weak subjects 3 months before exams.</p></div>`;
+        document.getElementById('premiumContent').innerHTML = html;
+    }
+    
+    function showExternalResources(){
+        let html = `<div class="cards-grid">
+            <div class="card" onclick="window.open('https://phet.colorado.edu','_blank')"><div class="card-icon">🔬</div><h3>PhET Simulations</h3><p>Science & Maths virtual labs (Free)</p></div>
+            <div class="card" onclick="window.open('https://www.education.gov.za','_blank')"><div class="card-icon">📜</div><h3>DBE Past Papers</h3><p>Official Matric papers & memos</p></div>
+            <div class="card" onclick="window.open('https://www.sace.org.za','_blank')"><div class="card-icon">👨‍🏫</div><h3>SACE CPTD Portal</h3><p>Tutor professional development</p></div>
+            <div class="card" onclick="window.open('https://wcedeportal.co.za','_blank')"><div class="card-icon">🏫</div><h3>WCED ePortal</h3><p>Additional CAPS-aligned content</p></div>
+        </div>`;
+        document.getElementById('premiumContent').innerHTML = html;
+    }
+    
+    // Tab switching for auth modal
+    document.querySelectorAll('.auth-tab').forEach(tab => { 
+        tab.addEventListener('click', () => { 
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active')); 
+            tab.classList.add('active'); 
+            let target = tab.getAttribute('data-tab'); 
+            document.getElementById('loginForm').classList.toggle('active', target === 'login'); 
+            document.getElementById('signupForm').classList.toggle('active', target === 'signup'); 
+        }); 
+    });
+    
+    // Check if user is already logged in
+    if(currentUser){ 
+        document.getElementById('authModal').style.display = 'none'; 
+        document.getElementById('mainApp').style.display = 'block'; 
+        document.getElementById('logoutBtn').style.display = 'block'; 
+        loadDashboard(); 
+    }
 </script>
 </body>
 </html>
