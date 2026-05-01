@@ -6,17 +6,25 @@
     <title>EduConnect FET | WCED & CAPS Aligned | Grades 10-12</title>
     <meta name="description" content="Professional CAPS-aligned FET Phase learning platform for Grades 10-12. Trusted by educators, parents, and students across South Africa.">
     
-    <!-- Firebase SDKs (Compat versions for stability) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <!-- Base44 SDK -->
+    <script src="https://cdn.base44.com/sdk/v1/base44-sdk.js"></script>
     
     <!-- Yoco SDK -->
     <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         :root {
             --primary: #1a5f7a;
             --primary-dark: #0d3b4f;
@@ -25,82 +33,505 @@
             --secondary-dark: #e0a800;
             --success: #2ecc71;
             --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
             --gray: #6c757d;
+            --gray-light: #e9ecef;
             --white: #ffffff;
+            --dark: #1a1a2e;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
             --shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+            --radius: 16px;
+            --radius-sm: 12px;
         }
+        
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #eef2f5 100%);
             min-height: 100vh;
             color: #333;
         }
-        .auth-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
-            z-index: 1000; display: flex; justify-content: center; align-items: center;
+        
+        /* Toast Notifications */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 10000;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.3s ease;
         }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        /* Auth Modal */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
         .auth-container {
-            background: var(--white); border-radius: 28px; padding: 2rem;
-            max-width: 550px; width: 90%; max-height: 90vh; overflow-y: auto;
+            background: var(--white);
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+        
+        .auth-tab {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            background: none;
+            border: none;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .auth-form input, .auth-form select, .auth-form textarea {
+            width: 100%;
+            padding: 0.9rem;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+        
+        .auth-form input:focus, .auth-form select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--primary-dark);
+            border: none;
+            padding: 0.9rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .logout-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo p {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        .compliance-badge {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: #e8f5e9;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+        
+        .dashboard.active {
+            display: block;
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--gray-light);
+            padding-bottom: 0.5rem;
+        }
+        
+        .nav-tab {
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            background: transparent;
+            color: var(--gray);
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #eef2f5;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
             box-shadow: var(--shadow);
         }
-        .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e9ecef; }
-        .auth-tab { padding: 0.75rem 1.25rem; cursor: pointer; font-weight: 600; color: var(--gray); background: none; border: none; font-size: 1rem; }
-        .auth-tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-        .auth-form { display: none; }
-        .auth-form.active { display: block; }
-        .auth-form input, .auth-form select {
-            width: 100%; padding: 0.9rem; margin-bottom: 1rem;
-            border: 1px solid #dee2e6; border-radius: 12px; font-size: 1rem;
+        
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
         }
-        .checkbox-label { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem; cursor: pointer; }
-        .btn-primary {
-            background: var(--primary); color: white; border: none;
-            padding: 0.9rem; border-radius: 40px; cursor: pointer;
-            font-weight: 600; width: 100%;
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
         }
-        .btn-primary:hover { opacity: 0.9; }
-        .logout-btn {
-            background: var(--danger); color: white; border: none;
-            padding: 0.5rem 1.2rem; border-radius: 40px; cursor: pointer;
-            position: fixed; top: 20px; right: 20px; z-index: 200;
+        
+        .caps-tag {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            display: inline-block;
         }
-        .header { background: var(--white); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
-        .header-content { max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .logo h1 { color: var(--primary); font-size: 1.5rem; }
-        .logo p { font-size: 0.7rem; color: var(--gray); }
-        .compliance-badge { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-        .badge { background: #e8f5e9; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.7rem; font-weight: 600; color: #2e7d32; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
-        .dashboard { display: none; }
-        .dashboard.active { display: block; }
-        .nav-tabs { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; }
-        .nav-tab { padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; background: transparent; color: var(--gray); font-weight: 600; border: none; }
-        .nav-tab.active { background: var(--primary); color: white; }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
-        .card { background: var(--white); border-radius: 20px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; border: 1px solid #eef2f5; }
-        .card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-        .card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
-        .card h3 { color: var(--primary); margin-bottom: 0.5rem; }
-        .caps-tag { background: #e8f5e9; color: #2e7d32; padding: 0.2rem 0.8rem; border-radius: 40px; font-size: 0.65rem; display: inline-block; }
-        .resource-list { background: var(--white); border-radius: 20px; overflow: hidden; border: 1px solid #eef2f5; }
-        .resource-item { padding: 1rem 1.5rem; border-bottom: 1px solid #eef2f5; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .resource-item h4 { color: var(--primary); }
-        .meta-tag { background: #e3f2fd; color: #1565c0; padding: 0.2rem 0.8rem; border-radius: 40px; font-size: 0.65rem; display: inline-block; margin-right: 0.5rem; }
-        .action-btn { background: var(--success); color: white; border: none; padding: 0.4rem 1.2rem; border-radius: 40px; cursor: pointer; }
-        .delete-btn { background: var(--danger); color: white; border: none; padding: 0.4rem 1.2rem; border-radius: 40px; cursor: pointer; }
-        .progress-section { background: var(--white); border-radius: 20px; padding: 1.5rem; margin-top: 2rem; }
-        .progress-bar-container { background: #e9ecef; border-radius: 40px; height: 12px; overflow: hidden; margin: 1rem 0; }
-        .progress-bar { background: linear-gradient(90deg, var(--primary), var(--secondary)); height: 100%; width: 0%; transition: width 0.5s; }
-        .welcome-banner { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; color: white; }
-        .upload-form { background: var(--white); border-radius: 20px; padding: 1.5rem; margin-bottom: 1rem; }
-        .upload-form input, .upload-form textarea, .upload-form select { width: 100%; padding: 0.8rem; margin-bottom: 0.75rem; border: 1px solid #dee2e6; border-radius: 12px; }
-        .footer { background: #1a1a2e; color: #aaa; text-align: center; padding: 2rem; margin-top: 3rem; font-size: 0.85rem; }
-        .footer a { color: var(--secondary); text-decoration: none; }
-        .upgrade-btn { background: var(--secondary); color: var(--primary-dark); border: none; padding: 0.8rem 1.5rem; border-radius: 40px; cursor: pointer; font-weight: 700; }
-        .membership-badge { background: #fff3e0; padding: 1rem; border-radius: 16px; margin: 1rem 0; text-align: center; }
-        @media (max-width: 768px) { .container { padding: 1rem; } .header-content { flex-direction: column; text-align: center; } .cards-grid { grid-template-columns: 1fr; } }
+        
+        /* Resource List */
+        .resource-list {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid #eef2f5;
+        }
+        
+        .resource-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eef2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            transition: background 0.2s;
+        }
+        
+        .resource-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .resource-item h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .meta-tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        
+        .action-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        
+        /* Progress Section */
+        .progress-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .progress-bar-container {
+            background: var(--gray-light);
+            border-radius: 40px;
+            height: 12px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+        
+        /* Upload Form */
+        .upload-form {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-form input, .upload-form textarea, .upload-form select {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: var(--radius-sm);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: #aaa;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.85rem;
+        }
+        
+        .footer a {
+            color: var(--secondary);
+            text-decoration: none;
+        }
+        
+        /* Upgrade Button */
+        .upgrade-btn {
+            background: var(--secondary);
+            color: var(--primary-dark);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        
+        .upgrade-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        
+        .membership-badge {
+            background: #fff3e0;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        /* Subject Card Colors */
+        .subject-math { border-left: 4px solid #3498db; }
+        .subject-physics { border-left: 4px solid #9b59b6; }
+        .subject-biology { border-left: 4px solid #2ecc71; }
+        .subject-accounting { border-left: 4px solid #f39c12; }
+        .subject-business { border-left: 4px solid #e67e22; }
+        .subject-economics { border-left: 4px solid #1abc9c; }
+        .subject-history { border-left: 4px solid #e74c3c; }
+        .subject-geography { border-left: 4px solid #16a085; }
+        .subject-english { border-left: 4px solid #2980b9; }
+        .subject-xhosa { border-left: 4px solid #8e44ad; }
+        .subject-lo { border-left: 4px solid #27ae60; }
+        
+        /* Price Tag */
+        .price-tag {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        /* Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header-content { flex-direction: column; text-align: center; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .logout-btn { top: 10px; right: 10px; padding: 0.3rem 0.8rem; font-size: 0.8rem; }
+        }
     </style>
 </head>
 <body>
@@ -115,9 +546,16 @@
         <div id="loginForm" class="auth-form active">
             <input type="email" id="loginEmail" placeholder="Email address">
             <input type="password" id="loginPassword" placeholder="Password">
-            <select id="loginRole"><option value="student">Student</option><option value="parent">Parent</option><option value="tutor">Tutor / Educator</option></select>
-            <button class="btn-primary" onclick="handleLogin()">Sign In</button>
-            <div class="membership-badge">📌 Free access to basic CAPS resources. <strong>Premium (R10/month)</strong> unlocks quizzes, past papers, and study planner.</div>
+            <select id="loginRole">
+                <option value="student">Student / Learner</option>
+                <option value="parent">Parent / Guardian</option>
+                <option value="tutor">Tutor / Educator</option>
+            </select>
+            <button class="btn-primary" id="loginBtn">Sign In</button>
+            <div class="membership-badge" style="margin-top: 1rem;">
+                📌 Free access to basic CAPS resources. 
+                <strong>Premium (R10/month)</strong> unlocks quizzes, past papers, and study planner.
+            </div>
         </div>
         <div id="signupForm" class="auth-form">
             <input type="text" id="signupName" placeholder="Full Name" required>
@@ -134,278 +572,396 @@
                 <option value="premium">Premium Plan (R10/month - Full Access)</option>
             </select>
             <label class="checkbox-label">
-                <input type="checkbox" id="popiaConsent"> I agree to the <a href="#" onclick="showPrivacyPolicy();return false;">Privacy Policy</a> (POPIA compliant)
+                <input type="checkbox" id="popiaConsent"> 
+                I agree to the <a href="#" id="privacyLink">Privacy Policy</a> (POPIA compliant)
             </label>
-            <button class="btn-primary" onclick="handleSignup()">Create Account</button>
-            <p style="font-size:0.7rem; text-align:center; margin-top:1rem;">Tutors: SACE registered OR university student? Both welcome!</p>
+            <button class="btn-primary" id="signupBtn">Create Account</button>
+            <p style="font-size:0.7rem; text-align:center; margin-top:1rem;">
+                Tutors: SACE registered OR university student? Both welcome!
+            </p>
         </div>
     </div>
 </div>
 
-<button id="logoutBtn" class="logout-btn" style="display:none;" onclick="logout()">Sign Out</button>
+<button id="logoutBtn" class="logout-btn" style="display:none;">
+    <i class="fas fa-sign-out-alt"></i> Sign Out
+</button>
 
 <div id="mainApp" style="display:none;">
     <div class="header">
         <div class="header-content">
-            <div class="logo"><h1>📚 EduConnect FET</h1><p>WCED & CAPS Aligned | Grades 10-12 | Matric Preparation</p></div>
+            <div class="logo">
+                <h1><i class="fas fa-graduation-cap"></i> EduConnect FET</h1>
+                <p>WCED & CAPS Aligned | Grades 10-12 | Matric Preparation</p>
+            </div>
             <div class="compliance-badge">
-                <span class="badge">✅ CAPS Aligned</span><span class="badge">📋 WCED Approved</span>
-                <span class="badge">👨‍🏫 SACE / University Tutors</span><span class="badge">🔒 POPIA Compliant</span>
-                <span class="badge">💳 Yoco Secure</span>
+                <span class="badge"><i class="fas fa-check-circle"></i> CAPS Aligned</span>
+                <span class="badge"><i class="fas fa-file-alt"></i> WCED Approved</span>
+                <span class="badge"><i class="fas fa-chalkboard-teacher"></i> SACE / University Tutors</span>
+                <span class="badge"><i class="fas fa-lock"></i> POPIA Compliant</span>
+                <span class="badge"><i class="fas fa-credit-card"></i> Yoco Secure</span>
             </div>
         </div>
     </div>
     <div class="container">
+        
         <!-- Student Dashboard -->
         <div id="studentDashboard" class="dashboard">
-            <div class="welcome-banner"><h2 id="studentName"></h2><div id="membershipAlert"></div></div>
-            <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showStudentSection('subjects')">📚 Subjects</button>
-                <button class="nav-tab" onclick="showStudentSection('resources')">📄 Resources</button>
-                <button class="nav-tab" onclick="showStudentSection('quizzes')">📝 Quizzes</button>
-                <button class="nav-tab" onclick="showStudentSection('premium')">⭐ Premium</button>
+            <div class="welcome-banner">
+                <h2 id="studentName"></h2>
+                <div id="membershipAlert"></div>
             </div>
-            <div id="studentSubjectsSection"><div class="cards-grid" id="subjectsGrid"></div><div id="termContentDisplay"></div></div>
-            <div id="studentResourcesSection" style="display:none;"><div id="studentResources" class="resource-list"></div><div class="progress-section"><h3>📊 Your Progress</h3><div class="progress-bar-container"><div class="progress-bar" id="studentProgress"></div></div><p id="progressText"></p></div></div>
-            <div id="studentQuizzesSection" style="display:none;"><div id="quizzesList" class="resource-list"></div></div>
-            <div id="studentPremiumSection" style="display:none;"><div class="cards-grid"><div class="card" onclick="loadQuizzes()"><div class="card-icon">📝</div><h3>Quizzes</h3></div><div class="card" onclick="loadPastPapers()"><div class="card-icon">📜</div><h3>Past Papers</h3></div><div class="card" onclick="loadStudyPlanner()"><div class="card-icon">📅</div><h3>Study Planner</h3></div></div><div id="premiumContent"></div></div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-student-section="subjects">
+                    <i class="fas fa-book"></i> Subjects
+                </button>
+                <button class="nav-tab" data-student-section="resources">
+                    <i class="fas fa-download"></i> Resources
+                </button>
+                <button class="nav-tab" data-student-section="quizzes">
+                    <i class="fas fa-puzzle-piece"></i> Quizzes
+                </button>
+                <button class="nav-tab" data-student-section="premium">
+                    <i class="fas fa-star"></i> Premium
+                </button>
+            </div>
+            <div id="studentSubjectsSection">
+                <div class="cards-grid" id="subjectsGrid"></div>
+                <div id="termContentDisplay"></div>
+            </div>
+            <div id="studentResourcesSection" style="display:none;">
+                <div id="studentResources" class="resource-list"></div>
+                <div class="progress-section">
+                    <h3><i class="fas fa-chart-line"></i> Your Progress</h3>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="studentProgress"></div>
+                    </div>
+                    <p id="progressText"></p>
+                </div>
+            </div>
+            <div id="studentQuizzesSection" style="display:none;">
+                <div id="quizzesList" class="resource-list"></div>
+            </div>
+            <div id="studentPremiumSection" style="display:none;">
+                <div class="cards-grid">
+                    <div class="card" id="loadQuizzesCard">
+                        <div class="card-icon"><i class="fas fa-puzzle-piece"></i></div>
+                        <h3>Interactive Quizzes</h3>
+                        <p>Test your knowledge with CAPS-aligned questions</p>
+                    </div>
+                    <div class="card" id="loadPastPapersCard">
+                        <div class="card-icon"><i class="fas fa-file-pdf"></i></div>
+                        <h3>Past Exam Papers</h3>
+                        <p>DBE official papers with memos</p>
+                    </div>
+                    <div class="card" id="loadStudyPlannerCard">
+                        <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <h3>Study Planner</h3>
+                        <p>Personalised Matric preparation schedule</p>
+                    </div>
+                </div>
+                <div id="premiumContent"></div>
+            </div>
         </div>
+        
         <!-- Parent Dashboard -->
-        <div id="parentDashboard" class="dashboard"><div class="welcome-banner"><h2 id="parentName"></h2><p>Monitor your child's progress</p></div><div class="nav-tabs"><button class="nav-tab active" onclick="showParentSection('progress')">📊 Progress</button><button class="nav-tab" onclick="showParentSection('resources')">📚 Resources</button></div><div id="parentProgressSection"><div id="parentContent" class="resource-list"></div></div><div id="parentResourcesSection" style="display:none;"><div id="parentResourcesList" class="resource-list"></div></div></div>
+        <div id="parentDashboard" class="dashboard">
+            <div class="welcome-banner">
+                <h2 id="parentName"></h2>
+                <p>Monitor your child's academic progress</p>
+            </div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-parent-section="progress">
+                    <i class="fas fa-chart-line"></i> Progress
+                </button>
+                <button class="nav-tab" data-parent-section="resources">
+                    <i class="fas fa-book"></i> Resources
+                </button>
+            </div>
+            <div id="parentProgressSection">
+                <div id="parentContent" class="resource-list"></div>
+            </div>
+            <div id="parentResourcesSection" style="display:none;">
+                <div id="parentResourcesList" class="resource-list"></div>
+            </div>
+        </div>
+        
         <!-- Tutor Dashboard -->
         <div id="tutorDashboard" class="dashboard">
-            <div class="welcome-banner"><h2 id="tutorName"></h2><p>Educator / Tutor Portal</p><div id="tutorMembershipAlert"></div></div>
-            <div class="nav-tabs"><button class="nav-tab active" onclick="showTutorSection('upload')">📤 Upload</button><button class="nav-tab" onclick="showTutorSection('manage')">📋 Manage</button><button class="nav-tab" onclick="showTutorSection('premium')">⭐ Premium</button></div>
+            <div class="welcome-banner">
+                <h2 id="tutorName"></h2>
+                <p>Educator / Tutor Portal</p>
+                <div id="tutorMembershipAlert"></div>
+            </div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tutor-section="upload">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+                <button class="nav-tab" data-tutor-section="manage">
+                    <i class="fas fa-edit"></i> Manage
+                </button>
+                <button class="nav-tab" data-tutor-section="premium">
+                    <i class="fas fa-star"></i> Premium
+                </button>
+            </div>
             <div id="tutorUploadSection">
                 <div class="upload-form">
-                    <h3>📎 Upload CAPS-Aligned Resource</h3>
+                    <h3><i class="fas fa-cloud-upload-alt"></i> Upload CAPS-Aligned Resource</h3>
                     <input type="text" id="resourceTitle" placeholder="Resource Title">
                     <textarea id="resourceDesc" placeholder="Description (CAPS learning outcomes)" rows="3"></textarea>
-                    <select id="resourceGrade"><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select>
+                    <select id="resourceGrade">
+                        <option>Grade 10</option>
+                        <option>Grade 11</option>
+                        <option>Grade 12</option>
+                    </select>
                     <select id="resourceSubject">
-                        <option>Mathematics</option><option>Physical Sciences</option><option>Life Sciences</option>
-                        <option>Accounting</option><option>Business Studies</option><option>Economics</option>
-                        <option>History</option><option>Geography</option><option>English HL</option>
-                        <option>isiXhosa HL</option><option>Life Orientation</option>
+                        <option>Mathematics</option>
+                        <option>Physical Sciences</option>
+                        <option>Life Sciences</option>
+                        <option>Accounting</option>
+                        <option>Business Studies</option>
+                        <option>Economics</option>
+                        <option>History</option>
+                        <option>Geography</option>
+                        <option>English HL</option>
+                        <option>isiXhosa HL</option>
+                        <option>Life Orientation</option>
                     </select>
                     <select id="resourceType">
-                        <option value="notes">📝 Notes</option><option value="slides">📊 Slides</option>
-                        <option value="worksheet">📄 Worksheet</option><option value="pastpaper">📜 Past Paper</option>
-                        <option value="video">🎥 Video</option><option value="phet">🔬 PhET</option>
+                        <option value="notes"><i class="fas fa-file-alt"></i> Notes</option>
+                        <option value="slides"><i class="fas fa-chalkboard"></i> Slides</option>
+                        <option value="worksheet"><i class="fas fa-file"></i> Worksheet</option>
+                        <option value="pastpaper"><i class="fas fa-file-pdf"></i> Past Paper</option>
+                        <option value="video"><i class="fas fa-video"></i> Video</option>
+                        <option value="phet"><i class="fas fa-flask"></i> PhET Simulation</option>
                     </select>
                     <div style="margin: 0.75rem 0;">
-                        <label style="display: block; margin-bottom: 0.5rem;">📎 Upload File (max 10MB)</label>
+                        <label style="display: block; margin-bottom: 0.5rem;">
+                            <i class="fas fa-paperclip"></i> Upload File (max 10MB)
+                        </label>
                         <input type="file" id="resourceFile" accept=".pdf,.ppt,.pptx,.doc,.docx,.jpg,.jpeg,.png">
                         <p style="font-size:0.7rem; color:#6c757d;">PDF, PowerPoint, Word, images supported</p>
                     </div>
                     <input type="url" id="resourceLink" placeholder="OR Paste Resource URL (YouTube, Google Drive, PhET)">
-                    <label class="checkbox-label"><input type="checkbox" id="capsConfirm"> ✅ CAPS aligned for FET Phase</label>
-                    <button class="btn-primary" onclick="uploadResource()">📤 Publish Resource</button>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="capsConfirm"> 
+                        ✅ CAPS aligned for FET Phase
+                    </label>
+                    <button class="btn-primary" id="publishResourceBtn">
+                        <i class="fas fa-paper-plane"></i> Publish Resource
+                    </button>
                 </div>
             </div>
-            <div id="tutorManageSection" style="display:none;"><div id="tutorResources" class="resource-list"></div></div>
-            <div id="tutorPremiumSection" style="display:none;"><div class="membership-badge"><h3>⭐ Premium Membership</h3><p class="price-tag" style="font-size:2rem;">R10 / month</p><button class="upgrade-btn" onclick="upgradeToPremium()">Upgrade</button></div></div>
+            <div id="tutorManageSection" style="display:none;">
+                <div id="tutorResources" class="resource-list"></div>
+            </div>
+            <div id="tutorPremiumSection" style="display:none;">
+                <div class="membership-badge">
+                    <h3><i class="fas fa-star"></i> Premium Membership</h3>
+                    <p class="price-tag">R10 <span style="font-size:1rem;">/ month</span></p>
+                    <button class="upgrade-btn" id="upgradePremiumBtn">
+                        <i class="fas fa-rocket"></i> Upgrade Now
+                    </button>
+                    <p style="margin-top: 1rem; font-size: 0.8rem;">
+                        ✓ Unlimited uploads<br>
+                        ✓ Advanced analytics<br>
+                        ✓ Priority support
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="footer"><p>EduConnect FET — WCED | CAPS | SACE | POPIA Compliant | Powered by Yoco</p><p>© 2025 Tech & Guard | <a href="#" onclick="showPrivacyPolicy();return false;">Privacy Policy</a> | <a href="#" onclick="showTerms();return false;">Terms</a></p></div>
+    <div class="footer">
+        <p>EduConnect FET — WCED | CAPS | SACE | POPIA Compliant | Powered by Yoco</p>
+        <p>© 2025 EduConnect FET | 
+            <a href="#" id="privacyFooterLink">Privacy Policy</a> | 
+            <a href="#" id="termsFooterLink">Terms of Service</a> |
+            <a href="#" id="contactFooterLink">Contact Us</a>
+        </p>
+    </div>
 </div>
 
 <script>
     // ============================================================
-    // ✅ FIREBASE CONFIGURATION (YOUR ACTUAL KEYS)
+    // BASE44 CONFIGURATION
     // ============================================================
-    const firebaseConfig = {
-        apiKey: "AIzaSyC1zkDiD5l7gD7voMK1zLElx3m4BjnEQAw",
-        authDomain: "educonnect-fet.firebaseapp.com",
-        projectId: "educonnect-fet",
-        storageBucket: "educonnect-fet.firebasestorage.app",
-        messagingSenderId: "1064618158680",
-        appId: "1:1064618158680:web:bca1250ec2da911630782d"
-    };
-    
-    // ============================================================
-    // ✅ YOUR YOCO LIVE PUBLIC KEY
-    // ============================================================
+    const BASE44_APP_ID = "cbef744a8545c389ef439ea6";
+    const BASE44_APP_BASE_URL = "https://educonnect-fet.base44.app";
     const YOCO_PUBLIC_KEY = "pk_live_2a11173e2rggAWL2ada4";
     
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-    
-    // Initialize Yoco (using correct SDK)
-    const yoco = new YocoSDK({ publicKey: YOCO_PUBLIC_KEY });
-    
-    // Global variables
+    // Base44 Client
+    let base44 = null;
     let currentUser = null;
-    let resources = JSON.parse(localStorage.getItem('eduResources_FET')) || [];
-    let completed = JSON.parse(localStorage.getItem('eduCompleted_FET')) || [];
-    let quizzes = [
-        { id: 1, subject: "Mathematics", question: "What is the derivative of x²?", options: ["2x", "x²", "2", "1"], answer: 0, explanation: "Using the power rule: d/dx(x^n) = n·x^(n-1), so d/dx(x²) = 2x." },
-        { id: 2, subject: "Physical Sciences", question: "Newton's First Law is also known as:", options: ["Law of Inertia", "Law of Acceleration", "Action-Reaction", "Law of Gravity"], answer: 0, explanation: "Newton's First Law states that an object remains at rest or in uniform motion unless acted upon by an external force." }
-    ];
+    let yoco = null;
     
-    // Sample resources if empty
-    if (resources.length === 0) {
-        resources = [
-            { id: 1, title: "Calculus: Differentiation", desc: "First principles and rules", grade: "Grade 12", subject: "Mathematics", type: "notes", fileUrl: null, term1Content: "Functions, limits, derivatives" },
-            { id: 2, title: "Newton's Laws - PhET", desc: "Interactive physics simulation", grade: "Grade 11", subject: "Physical Sciences", type: "phet", fileUrl: "https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/forces-and-motion-basics_en.html", term1Content: "Forces, free-body diagrams" },
-            { id: 3, title: "Human Reproduction", desc: "Life Sciences - reproductive systems", grade: "Grade 12", subject: "Life Sciences", type: "notes", fileUrl: null, term1Content: "Reproductive anatomy, gametogenesis" }
-        ];
-        localStorage.setItem('eduResources_FET', JSON.stringify(resources));
-    }
+    // Local data
+    let resources = [];
+    let completed = [];
     
     // All 11 CAPS FET subjects
     const subjects = [
-        { name: "Mathematics", icon: "🔢" }, { name: "Physical Sciences", icon: "⚛️" }, { name: "Life Sciences", icon: "🧬" },
-        { name: "Accounting", icon: "📊" }, { name: "Business Studies", icon: "🏢" }, { name: "Economics", icon: "💰" },
-        { name: "History", icon: "🏛️" }, { name: "Geography", icon: "🌍" }, { name: "English HL", icon: "📖" },
-        { name: "isiXhosa HL", icon: "🗣️" }, { name: "Life Orientation", icon: "🌟" }
+        { name: "Mathematics", icon: "📐", color: "subject-math", description: "Algebra, calculus, trigonometry, geometry, statistics", category: "Mathematics" },
+        { name: "Physical Sciences", icon: "⚗️", color: "subject-physics", description: "Physics and Chemistry - mechanics, waves, electricity, chemical reactions", category: "Sciences" },
+        { name: "Life Sciences", icon: "🧬", color: "subject-biology", description: "Biology - cells, genetics, evolution, physiology, ecology", category: "Sciences" },
+        { name: "Accounting", icon: "📊", color: "subject-accounting", description: "Financial accounting, statements, VAT, cost accounting", category: "Commerce" },
+        { name: "Business Studies", icon: "💼", color: "subject-business", description: "Business environments, entrepreneurship, management, marketing", category: "Commerce" },
+        { name: "Economics", icon: "📈", color: "subject-economics", description: "Micro and macroeconomics, market structures, inflation", category: "Commerce" },
+        { name: "History", icon: "🏛️", color: "subject-history", description: "South African and world history - colonialism, apartheid, World Wars", category: "Humanities" },
+        { name: "Geography", icon: "🌍", color: "subject-geography", description: "Physical and human geography - climate, population, mapwork", category: "Humanities" },
+        { name: "English HL", icon: "📖", color: "subject-english", description: "Literature, poetry, language structures, writing skills", category: "Languages" },
+        { name: "isiXhosa HL", icon: "🗣️", color: "subject-xhosa", description: "isiXhosa literature, oral traditions, grammar, writing", category: "Languages" },
+        { name: "Life Orientation", icon: "🌱", color: "subject-lo", description: "Personal development, career guidance, health, citizenship", category: "Life Skills" }
     ];
     
-    // Helper Functions
-    function showToast(message) {
+    // Quizzes
+    const quizzes = [
+        { 
+            id: 1, 
+            subject: "Mathematics", 
+            question: "What is the derivative of x²?", 
+            options: ["2x", "x²", "2", "1"], 
+            answer: 0, 
+            explanation: "Using the power rule: d/dx(x^n) = n·x^(n-1), so d/dx(x²) = 2x." 
+        },
+        { 
+            id: 2, 
+            subject: "Physical Sciences", 
+            question: "Newton's First Law is also known as:", 
+            options: ["Law of Inertia", "Law of Acceleration", "Action-Reaction", "Law of Gravity"], 
+            answer: 0, 
+            explanation: "Newton's First Law states that an object remains at rest or in uniform motion unless acted upon by an external force." 
+        },
+        { 
+            id: 3, 
+            subject: "Life Sciences", 
+            question: "Which organelle is responsible for cellular respiration?", 
+            options: ["Nucleus", "Mitochondria", "Ribosome", "Chloroplast"], 
+            answer: 1, 
+            explanation: "Mitochondria are the powerhouses of the cell, producing ATP through cellular respiration." 
+        }
+    ];
+    
+    // ============================================================
+    // HELPER FUNCTIONS
+    // ============================================================
+    
+    function showToast(message, type = 'success') {
         let toast = document.createElement('div');
         toast.className = 'toast-notification';
-        toast.innerText = message;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
     
     function showPrivacyPolicy() {
-        alert("📜 POPIA PRIVACY POLICY\n\nEduConnect FET collects your name, email, and SACE/student number solely for platform access and verification.\n\n• Your data is stored securely with Firebase (Google Cloud)\n• Your data is not shared with any third parties\n• You have the right to access, correct, or request deletion of your data\n• Contact: aneleq@techandguard.co.za");
+        alert("📜 POPIA PRIVACY POLICY\n\nEduConnect FET collects your name, email, and SACE/student number solely for platform access and verification.\n\n• Your data is stored securely with Base44\n• Your data is not shared with any third parties\n• You have the right to access, correct, or request deletion of your data\n• Contact: support@educonnectfet.co.za");
     }
     
     function showTerms() {
         alert("📋 TERMS OF SERVICE\n\nEduConnect FET is an independent educational platform aligned with WCED, CAPS, and SACE standards but is NOT an official government portal.\n\n• Premium subscriptions are R10/month and are non-refundable\n• Users agree to use the platform for lawful educational purposes only\n• Educators confirm they hold valid SACE registration or are enrolled university students\n• Violation may result in account termination");
     }
     
-    // Dynamic credential field for tutors
-    function updateCredentialField() {
-        const role = document.getElementById('signupRole').value;
-        const container = document.getElementById('credentialField');
-        if (role === 'tutor') {
-            container.innerHTML = `
-                <select id="tutorType" style="width:100%; padding:0.9rem; margin-bottom:0.5rem; border-radius:12px;">
-                    <option value="sace">SACE Registered Professional Educator</option>
-                    <option value="student">University Student Tutor</option>
-                </select>
-                <div id="tutorCredentialInput">
-                    <input type="text" id="tutorCredential" placeholder="SACE Registration Number" style="width:100%; padding:0.9rem; border-radius:12px;">
-                    <p style="font-size:0.7rem; color:#6c757d;">SACE registered educators enter your SACE number.</p>
-                </div>
-            `;
-            document.getElementById('tutorType').addEventListener('change', function() {
-                const inputDiv = document.getElementById('tutorCredentialInput');
-                if (this.value === 'sace') {
-                    inputDiv.innerHTML = `<input type="text" id="tutorCredential" placeholder="SACE Registration Number" style="width:100%; padding:0.9rem; border-radius:12px;"><p style="font-size:0.7rem;">Your SACE number will be verified against the official SACE register.</p>`;
-                } else {
-                    inputDiv.innerHTML = `<input type="text" id="tutorCredential" placeholder="Student Number" style="width:100%; padding:0.9rem; margin-bottom:0.5rem; border-radius:12px;">
-                        <select id="universityName" style="width:100%; padding:0.9rem; border-radius:12px;">
-                            <option value="">Select University</option>
-                            <option>University of Cape Town (UCT)</option><option>University of the Witwatersrand (Wits)</option>
-                            <option>Stellenbosch University</option><option>University of Pretoria (UP)</option>
-                            <option>University of Johannesburg (UJ)</option><option>University of KwaZulu-Natal (UKZN)</option>
-                            <option>North-West University (NWU)</option><option>Rhodes University</option>
-                            <option>University of the Western Cape (UWC)</option><option>University of South Africa (UNISA)</option>
-                        </select>
-                        <p style="font-size:0.7rem;">University students: Your student number and university help verify your credibility as a tutor.</p>`;
-                }
-            });
+    function showContact() {
+        alert("📧 CONTACT US\n\nEmail: support@educonnectfet.co.za\nPhone: 021 123 4567\nAddress: Cape Town, South Africa\n\nOffice Hours: Mon-Fri 9am-5pm");
+    }
+    
+    // Load local data
+    function loadLocalData() {
+        const savedResources = localStorage.getItem('eduResources_FET');
+        const savedCompleted = localStorage.getItem('eduCompleted_FET');
+        
+        if (savedResources) {
+            resources = JSON.parse(savedResources);
         } else {
-            container.innerHTML = '';
+            resources = [
+                { id: 1, title: "Calculus: Differentiation", desc: "First principles and rules of differentiation", grade: "Grade 12", subject: "Mathematics", type: "notes", fileUrl: null, downloadCount: 0 },
+                { id: 2, title: "Newton's Laws - PhET Simulation", desc: "Interactive physics simulation for forces and motion", grade: "Grade 11", subject: "Physical Sciences", type: "phet", fileUrl: "https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/forces-and-motion-basics_en.html", downloadCount: 0 },
+                { id: 3, title: "Human Reproduction", desc: "Complete guide to human reproductive system", grade: "Grade 12", subject: "Life Sciences", type: "notes", fileUrl: null, downloadCount: 0 },
+                { id: 4, title: "Accounting: Cash Flow Statement", desc: "Understanding cash flow statements for companies", grade: "Grade 12", subject: "Accounting", type: "notes", fileUrl: null, downloadCount: 0 },
+                { id: 5, title: "Business Studies: Business Environments", desc: "Micro, market and macro environments", grade: "Grade 10", subject: "Business Studies", type: "notes", fileUrl: null, downloadCount: 0 }
+            ];
+            localStorage.setItem('eduResources_FET', JSON.stringify(resources));
+        }
+        
+        if (savedCompleted) {
+            completed = JSON.parse(savedCompleted);
+        } else {
+            completed = [];
+            localStorage.setItem('eduCompleted_FET', JSON.stringify(completed));
         }
     }
     
-    // File upload to Firebase Storage
-    async function uploadResourceFile(file, resourceId) {
-        if (!file) return null;
-        if (file.size > 10 * 1024 * 1024) {
-            alert('File too large. Maximum file size is 10MB.');
-            return null;
-        }
-        try {
-            const fileExtension = file.name.split('.').pop();
-            const fileName = `${resourceId}_${Date.now()}.${fileExtension}`;
-            const storageRef = storage.ref(`resources/${fileName}`);
-            const uploadTask = await storageRef.put(file);
-            const downloadURL = await uploadTask.ref.getDownloadURL();
-            return downloadURL;
-        } catch (error) {
-            console.error('Upload error:', error);
-            alert('File upload failed: ' + error.message);
-            return null;
-        }
-    }
-    
-    // Upload resource (with file or URL)
-    async function uploadResource() {
-        const title = document.getElementById('resourceTitle').value;
-        const desc = document.getElementById('resourceDesc').value;
-        const grade = document.getElementById('resourceGrade').value;
-        const subject = document.getElementById('resourceSubject').value;
-        const type = document.getElementById('resourceType').value;
-        const link = document.getElementById('resourceLink').value;
-        const fileInput = document.getElementById('resourceFile');
-        const confirmed = document.getElementById('capsConfirm').checked;
-        
-        if (!title || !desc) { alert('Please complete all fields'); return; }
-        if (!confirmed) { alert('You must confirm that this resource is CAPS-aligned before uploading.'); return; }
-        
-        let fileUrl = link || null;
-        if (fileInput && fileInput.files.length > 0) {
-            fileUrl = await uploadResourceFile(fileInput.files[0], Date.now());
-            if (!fileUrl && fileInput.files.length > 0) return;
-        }
-        
-        const newResource = {
-            id: Date.now(),
-            title, desc, grade, subject, type,
-            fileUrl: fileUrl || '#',
-            uploadedBy: currentUser?.uid,
-            uploadedAt: new Date().toISOString()
-        };
-        
-        resources.push(newResource);
-        localStorage.setItem('eduResources_FET', JSON.stringify(resources));
-        
-        document.getElementById('resourceTitle').value = '';
-        document.getElementById('resourceDesc').value = '';
-        document.getElementById('resourceLink').value = '';
-        if (fileInput) fileInput.value = '';
-        document.getElementById('capsConfirm').checked = false;
-        
-        renderTutorResources();
-        renderStudentResources();
-        updateProgress();
-        alert('✅ CAPS-aligned resource uploaded successfully!');
-    }
-    
-    // Yoco Payment Function
-    function upgradeToPremium() {
-        yoco.showPopup({
-            amountInCents: 1000,
-            currency: 'ZAR',
-            name: 'EduConnect Premium Membership',
-            description: 'Monthly subscription - Full access to all CAPS resources and quizzes',
-            callback: async function(result) {
-                if (result.error) {
-                    alert("Payment failed: " + result.error.message);
-                } else {
-                    alert("✅ Payment successful! Your premium account is now active. Please log in again.");
-                    if (currentUser) {
-                        await db.collection('users').doc(currentUser.uid).update({ membership: 'premium' });
-                        currentUser.membership = 'premium';
-                        sessionStorage.setItem('educonnect_current', JSON.stringify(currentUser));
-                        location.reload();
-                    }
-                }
+    // Initialize Base44
+    async function initBase44() {
+        if (typeof Base44SDK !== 'undefined') {
+            base44 = new Base44SDK({
+                appId: BASE44_APP_ID,
+                baseUrl: BASE44_APP_BASE_URL
+            });
+            
+            // Check for existing session
+            const savedUser = sessionStorage.getItem('educonnect_current');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('authModal').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'block';
+                loadDashboard();
             }
-        });
+        } else {
+            console.warn('Base44 SDK not loaded yet, retrying...');
+            setTimeout(initBase44, 500);
+        }
     }
     
-    // Authentication Functions
+    // Initialize Yoco
+    function initYoco() {
+        if (typeof YocoSDK !== 'undefined') {
+            yoco = new YocoSDK({ publicKey: YOCO_PUBLIC_KEY });
+        }
+    }
+    
+    // ============================================================
+    // AUTHENTICATION FUNCTIONS
+    // ============================================================
+    
+    async function handleLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const role = document.getElementById('loginRole').value;
+        
+        if (!email || !password) {
+            showToast('Please enter email and password', 'error');
+            return;
+        }
+        
+        try {
+            // Use Base44 authentication
+            const user = await base44.auth.login(email, password);
+            
+            // Store user data
+            currentUser = {
+                uid: user.id,
+                name: user.full_name || email.split('@')[0],
+                email: user.email,
+                role: role,
+                membership: user.subscription?.plan || 'free'
+            };
+            
+            sessionStorage.setItem('educonnect_current', JSON.stringify(currentUser));
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'block';
+            loadDashboard();
+            showToast(`Welcome back, ${currentUser.name}!`, 'success');
+        } catch (error) {
+            showToast('Login failed: ' + error.message, 'error');
+        }
+    }
+    
     async function handleSignup() {
         const name = document.getElementById('signupName').value;
         const email = document.getElementById('signupEmail').value;
@@ -414,9 +970,18 @@
         const membership = document.getElementById('signupMembership').value;
         const consent = document.getElementById('popiaConsent').checked;
         
-        if (!name || !email || !password) { alert('Please fill all required fields'); return; }
-        if (!consent) { alert('You must consent to the POPIA Privacy Policy to create an account'); return; }
-        if (password.length < 6) { alert('Password must be at least 6 characters'); return; }
+        if (!name || !email || !password) {
+            showToast('Please fill all required fields', 'error');
+            return;
+        }
+        if (!consent) {
+            showToast('You must consent to the POPIA Privacy Policy', 'error');
+            return;
+        }
+        if (password.length < 6) {
+            showToast('Password must be at least 6 characters', 'error');
+            return;
+        }
         
         let tutorType = null;
         let tutorCredential = null;
@@ -426,85 +991,97 @@
             tutorType = document.getElementById('tutorType')?.value;
             tutorCredential = document.getElementById('tutorCredential')?.value;
             university = document.getElementById('universityName')?.value;
-            if (!tutorCredential) { alert('Please enter your SACE number or student number'); return; }
-            if (tutorType === 'student' && !university) { alert('Please select your university'); return; }
+            if (!tutorCredential) {
+                showToast('Please enter your SACE number or student number', 'error');
+                return;
+            }
         }
         
         try {
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const uid = userCredential.user.uid;
-            await db.collection('users').doc(uid).set({
-                name: name, email: email, role: role, membership: membership,
-                tutorType: tutorType, tutorCredential: tutorCredential, university: university,
-                createdAt: new Date().toISOString(), popiaConsent: true
+            const newUser = await base44.auth.signup(email, password, {
+                full_name: name,
+                role: role,
+                membership: membership,
+                tutor_type: tutorType,
+                tutor_credential: tutorCredential,
+                university: university,
+                popia_consent: true
             });
-            alert('Account created successfully! Please sign in.');
+            
+            showToast('Account created successfully! Please sign in.', 'success');
             document.querySelector('.auth-tab[data-tab="login"]').click();
-        } catch (error) { alert('Error: ' + error.message); }
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
     }
     
-    async function handleLogin() {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        const role = document.getElementById('loginRole').value;
-        if (!email || !password) { alert('Please enter email and password'); return; }
-        
-        try {
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            const uid = userCredential.user.uid;
-            const userDoc = await db.collection('users').doc(uid).get();
-            if (!userDoc.exists) { alert('User data not found'); return; }
-            const userData = userDoc.data();
-            if (userData.role !== role) { alert(`You are registered as a ${userData.role}. Please select the correct role.`); await auth.signOut(); return; }
-            currentUser = { uid, ...userData };
-            sessionStorage.setItem('educonnect_current', JSON.stringify(currentUser));
-            document.getElementById('authModal').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            document.getElementById('logoutBtn').style.display = 'block';
-            loadDashboard();
-        } catch (error) { alert('Login failed: ' + error.message); }
+    function logout() {
+        base44.auth.logout();
+        sessionStorage.removeItem('educonnect_current');
+        currentUser = null;
+        location.reload();
     }
     
-    function logout() { auth.signOut(); sessionStorage.removeItem('educonnect_current'); location.reload(); }
+    // ============================================================
+    // DASHBOARD FUNCTIONS
+    // ============================================================
     
-    // Dashboard Loading
     function loadDashboard() {
-        const saved = sessionStorage.getItem('educonnect_current');
-        if (!saved) return;
-        currentUser = JSON.parse(saved);
+        if (!currentUser) return;
         
         document.querySelectorAll('.dashboard').forEach(d => d.classList.remove('active'));
         
         if (currentUser.role === 'student') {
             document.getElementById('studentDashboard').classList.add('active');
-            document.getElementById('studentName').innerHTML = `Welcome, ${currentUser.name}!`;
+            document.getElementById('studentName').innerHTML = `Welcome, ${currentUser.name}! <i class="fas fa-smile-wink"></i>`;
+            
             if (currentUser.membership !== 'premium') {
-                document.getElementById('membershipAlert').innerHTML = `<div class="membership-badge"><button class="upgrade-btn" onclick="upgradeToPremium()">⭐ Upgrade to Premium (R10/month) → Unlock Quizzes, Past Papers & Study Planner</button></div>`;
+                document.getElementById('membershipAlert').innerHTML = `
+                    <div class="membership-badge">
+                        <button class="upgrade-btn" onclick="window.upgradeToPremium()">
+                            ⭐ Upgrade to Premium (R10/month) → Unlock Quizzes, Past Papers & Study Planner
+                        </button>
+                    </div>`;
             } else {
-                document.getElementById('membershipAlert').innerHTML = `<div class="membership-badge" style="background:#d4edda;">⭐ Premium Member — Full access to all CAPS content</div>`;
+                document.getElementById('membershipAlert').innerHTML = `
+                    <div class="membership-badge" style="background:#d4edda;">
+                        <i class="fas fa-star"></i> Premium Member — Full access to all CAPS content
+                    </div>`;
             }
             renderSubjectsGrid();
             renderStudentResources();
             updateProgress();
         } else if (currentUser.role === 'parent') {
             document.getElementById('parentDashboard').classList.add('active');
-            document.getElementById('parentName').innerHTML = `Welcome, ${currentUser.name}!`;
+            document.getElementById('parentName').innerHTML = `Welcome, ${currentUser.name}! <i class="fas fa-heart"></i>`;
             viewChildProgress();
         } else {
             document.getElementById('tutorDashboard').classList.add('active');
-            document.getElementById('tutorName').innerHTML = `Welcome, ${currentUser.name}!`;
+            document.getElementById('tutorName').innerHTML = `Welcome, ${currentUser.name}! <i class="fas fa-chalkboard-teacher"></i>`;
+            
             if (currentUser.membership !== 'premium') {
-                document.getElementById('tutorMembershipAlert').innerHTML = `<div class="membership-badge"><button class="upgrade-btn" onclick="upgradeToPremium()">⭐ Upgrade to Premium (R10/month) for Unlimited Uploads & Analytics</button></div>`;
+                document.getElementById('tutorMembershipAlert').innerHTML = `
+                    <div class="membership-badge">
+                        <button class="upgrade-btn" onclick="window.upgradeToPremium()">
+                            ⭐ Upgrade to Premium (R10/month) for Unlimited Uploads & Analytics
+                        </button>
+                    </div>`;
             }
             renderTutorResources();
         }
     }
     
-    // Student Functions
     function renderSubjectsGrid() {
         let html = '';
         subjects.forEach(s => {
-            html += `<div class="card" onclick="filterBySubject('${s.name}')"><div class="card-icon">${s.icon}</div><h3>${s.name}</h3><span class="caps-tag">📋 CAPS: FET ${s.name}</span></div>`;
+            html += `
+                <div class="card ${s.color}" onclick="filterBySubject('${s.name}')">
+                    <div class="card-icon">${s.icon}</div>
+                    <h3>${s.name}</h3>
+                    <p style="font-size:0.8rem; color:#666; margin-bottom:0.5rem;">${s.description.substring(0, 60)}...</p>
+                    <span class="caps-tag">📋 CAPS: FET ${s.name}</span>
+                </div>
+            `;
         });
         document.getElementById('subjectsGrid').innerHTML = html;
     }
@@ -512,34 +1089,144 @@
     function filterBySubject(subject) {
         const container = document.getElementById('studentResources');
         const filtered = resources.filter(r => r.subject === subject);
-        container.innerHTML = filtered.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div>${r.fileUrl && r.fileUrl !== '#' ? `<div><a href="${r.fileUrl}" target="_blank" class="action-btn" style="background:#1a5f7a;">📥 Download</a></div>` : ''}</div>${!completed.includes(r.id) ? '<button class="action-btn" onclick="markComplete(' + r.id + ')">✅ Mark Complete</button>' : '<span>✓ Completed (CAPS Outcome Achieved)</span>'}</div>`).join('');
+        
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="resource-item">
+                    <div style="text-align: center; width: 100%; padding: 2rem;">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; color: #ccc;"></i>
+                        <p>No resources available for ${subject} yet.</p>
+                        <p style="font-size: 0.8rem;">Check back soon as tutors upload new content!</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            container.innerHTML = filtered.map(r => `
+                <div class="resource-item">
+                    <div>
+                        <h4><i class="fas ${r.type === 'notes' ? 'fa-file-alt' : r.type === 'video' ? 'fa-video' : 'fa-download'}"></i> ${r.title}</h4>
+                        <p>${r.desc}</p>
+                        <div>
+                            <span class="meta-tag"><i class="fas fa-graduation-cap"></i> ${r.grade}</span>
+                            <span class="meta-tag"><i class="fas fa-book"></i> ${r.subject}</span>
+                        </div>
+                        ${r.fileUrl && r.fileUrl !== '#' ? `
+                            <div style="margin-top: 0.5rem;">
+                                <a href="${r.fileUrl}" target="_blank" class="action-btn" style="background:#1a5f7a; text-decoration:none;">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div>
+                        ${!completed.includes(r.id) ? 
+                            '<button class="action-btn" onclick="markComplete(' + r.id + ')"><i class="fas fa-check"></i> Mark Complete</button>' : 
+                            '<span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Completed</span>'}
+                    </div>
+                </div>
+            `).join('');
+        }
         showStudentSection('resources');
     }
     
     function renderStudentResources() {
         const container = document.getElementById('studentResources');
         if (!container) return;
-        container.innerHTML = resources.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div>${r.fileUrl && r.fileUrl !== '#' ? `<div><a href="${r.fileUrl}" target="_blank" class="action-btn" style="background:#1a5f7a;">📥 Download</a></div>` : ''}</div>${!completed.includes(r.id) ? '<button class="action-btn" onclick="markComplete(' + r.id + ')">✅ Mark Complete</button>' : '<span>✓ Completed (CAPS Outcome Achieved)</span>'}</div>`).join('');
+        
+        if (resources.length === 0) {
+            container.innerHTML = `
+                <div class="resource-item">
+                    <div style="text-align: center; width: 100%; padding: 2rem;">
+                        <i class="fas fa-database" style="font-size: 3rem; color: #ccc;"></i>
+                        <p>No resources available yet.</p>
+                        <p style="font-size: 0.8rem;">Check back soon for CAPS-aligned study materials!</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = resources.map(r => `
+            <div class="resource-item">
+                <div>
+                    <h4><i class="fas ${r.type === 'notes' ? 'fa-file-alt' : r.type === 'video' ? 'fa-video' : 'fa-download'}"></i> ${r.title}</h4>
+                    <p>${r.desc}</p>
+                    <div>
+                        <span class="meta-tag"><i class="fas fa-graduation-cap"></i> ${r.grade}</span>
+                        <span class="meta-tag"><i class="fas fa-book"></i> ${r.subject}</span>
+                    </div>
+                    ${r.fileUrl && r.fileUrl !== '#' ? `
+                        <div style="margin-top: 0.5rem;">
+                            <a href="${r.fileUrl}" target="_blank" class="action-btn" style="background:#1a5f7a; text-decoration:none;">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </div>
+                    ` : ''}
+                </div>
+                <div>
+                    ${!completed.includes(r.id) ? 
+                        '<button class="action-btn" onclick="markComplete(' + r.id + ')"><i class="fas fa-check"></i> Mark Complete</button>' : 
+                        '<span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Completed</span>'}
+                </div>
+            </div>
+        `).join('');
     }
     
     function renderQuizzesList() {
         const container = document.getElementById('quizzesList');
         if (!container) return;
+        
         if (!currentUser || currentUser.membership !== 'premium') {
-            container.innerHTML = `<div class="membership-badge"><button class="upgrade-btn" onclick="upgradeToPremium()">⭐ Upgrade to Premium (R10/month) to access interactive CAPS-aligned quizzes</button></div>`;
+            container.innerHTML = `
+                <div class="membership-badge">
+                    <button class="upgrade-btn" onclick="window.upgradeToPremium()">
+                        ⭐ Upgrade to Premium (R10/month) to access interactive CAPS-aligned quizzes
+                    </button>
+                </div>`;
             return;
         }
+        
         container.innerHTML = quizzes.map(q => `
             <div class="resource-item">
-                <div>
-                    <p><strong>${q.question}</strong></p>
-                    <div style="margin-top:0.5rem;">
-                        ${q.options.map((opt, idx) => `<button class="action-btn" style="margin:0.25rem; background:#e3f2fd; color:#1565c0;" onclick="alert('${opt}')">${String.fromCharCode(65+idx)}. ${opt}</button>`).join('')}
+                <div style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <h4><i class="fas fa-question-circle"></i> ${q.subject}</h4>
+                        <span class="meta-tag">Quiz</span>
                     </div>
-                    <div id="quiz-result-${q.id}" style="margin-top:0.5rem; font-size:0.85rem;"></div>
+                    <p><strong>${q.question}</strong></p>
+                    <div style="margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        ${q.options.map((opt, idx) => `
+                            <button class="action-btn" style="margin:0; background:#e3f2fd; color:#1565c0;" onclick="checkQuizAnswer(${q.id}, ${idx}, '${opt.replace(/'/g, "\\'")}')">
+                                ${String.fromCharCode(65+idx)}. ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="quiz-result-${q.id}" style="margin-top: 0.75rem; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; background: #f8f9fa;"></div>
                 </div>
             </div>
         `).join('');
+    }
+    
+    function checkQuizAnswer(quizId, selectedIndex, selectedText) {
+        const quiz = quizzes.find(q => q.id === quizId);
+        const resultDiv = document.getElementById(`quiz-result-${quizId}`);
+        
+        if (selectedIndex === quiz.answer) {
+            resultDiv.innerHTML = `
+                <span style="color: #2ecc71;">
+                    <i class="fas fa-check-circle"></i> Correct! ${quiz.explanation}
+                </span>
+            `;
+            showToast('✓ Correct answer! Well done!', 'success');
+        } else {
+            const correctAnswer = String.fromCharCode(65 + quiz.answer) + '. ' + quiz.options[quiz.answer];
+            resultDiv.innerHTML = `
+                <span style="color: #e74c3c;">
+                    <i class="fas fa-times-circle"></i> Incorrect. The correct answer is ${correctAnswer}.<br>
+                    <small>${quiz.explanation}</small>
+                </span>
+            `;
+        }
     }
     
     function markComplete(id) {
@@ -557,22 +1244,48 @@
         const bar = document.getElementById('studentProgress');
         if (bar) bar.style.width = p + '%';
         const txt = document.getElementById('progressText');
-        if (txt) txt.innerText = `🎓 Completed ${completed.length} of ${resources.length} CAPS topics (${Math.round(p)}%) - ${p >= 80 ? 'Excellent! Ready for Matric.' : p >= 50 ? 'Good progress. Keep going!' : 'Keep working through CAPS topics.'}`;
+        if (txt) {
+            let message = '';
+            if (p >= 80) message = '🎓 Excellent! You\'re well-prepared for Matric exams. Keep up the great work!';
+            else if (p >= 50) message = '📚 Good progress! You\'re on track. Stay consistent with your studies.';
+            else message = '💪 Keep working through CAPS topics. Every completed topic brings you closer to success!';
+            
+            txt.innerHTML = `<i class="fas fa-trophy"></i> Completed ${completed.length} of ${resources.length} CAPS topics (${Math.round(p)}%)<br><small>${message}</small>`;
+        }
     }
     
-    // Tutor Functions
     function renderTutorResources() {
         const container = document.getElementById('tutorResources');
         if (!container) return;
-        container.innerHTML = resources.map(r => `
+        
+        const myResources = resources.filter(r => r.uploadedBy === currentUser?.uid);
+        
+        if (myResources.length === 0) {
+            container.innerHTML = `
+                <div class="resource-item">
+                    <div style="text-align: center; width: 100%; padding: 2rem;">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #ccc;"></i>
+                        <p>You haven't uploaded any resources yet.</p>
+                        <p style="font-size: 0.8rem;">Click the Upload tab to share CAPS-aligned materials with students!</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = myResources.map(r => `
             <div class="resource-item">
                 <div>
-                    <h4>${r.title}</h4>
+                    <h4><i class="fas ${r.type === 'notes' ? 'fa-file-alt' : 'fa-download'}"></i> ${r.title}</h4>
                     <p>${r.desc}</p>
-                    <div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div>
-                    ${r.fileUrl && r.fileUrl !== '#' ? `<div class="meta-tag">📎 File attached</div>` : ''}
+                    <div>
+                        <span class="meta-tag"><i class="fas fa-graduation-cap"></i> ${r.grade}</span>
+                        <span class="meta-tag"><i class="fas fa-book"></i> ${r.subject}</span>
+                        <span class="meta-tag"><i class="fas fa-download"></i> ${r.downloadCount || 0} downloads</span>
+                    </div>
+                    ${r.fileUrl && r.fileUrl !== '#' ? `<div class="meta-tag"><i class="fas fa-paperclip"></i> File attached</div>` : ''}
                 </div>
-                <button class="delete-btn" onclick="deleteResource(${r.id})">🗑 Delete</button>
+                <button class="delete-btn" onclick="deleteResource(${r.id})"><i class="fas fa-trash"></i> Delete</button>
             </div>
         `).join('');
     }
@@ -588,75 +1301,153 @@
         }
     }
     
-    // Parent Functions
+    async function uploadResource() {
+        const title = document.getElementById('resourceTitle').value;
+        const desc = document.getElementById('resourceDesc').value;
+        const grade = document.getElementById('resourceGrade').value;
+        const subject = document.getElementById('resourceSubject').value;
+        const type = document.getElementById('resourceType').value;
+        const link = document.getElementById('resourceLink').value;
+        const fileInput = document.getElementById('resourceFile');
+        const confirmed = document.getElementById('capsConfirm').checked;
+        
+        if (!title || !desc) {
+            showToast('Please complete all fields', 'error');
+            return;
+        }
+        if (!confirmed) {
+            showToast('You must confirm that this resource is CAPS-aligned.', 'error');
+            return;
+        }
+        
+        let fileUrl = link || null;
+        
+        // Handle file upload (in a real implementation, this would upload to Base44 storage)
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('File too large. Maximum file size is 10MB.', 'error');
+                return;
+            }
+            // In production, upload to Base44 storage
+            fileUrl = URL.createObjectURL(file);
+        }
+        
+        const newResource = {
+            id: Date.now(),
+            title, desc, grade, subject, type,
+            fileUrl: fileUrl || '#',
+            uploadedBy: currentUser?.uid,
+            uploadedAt: new Date().toISOString(),
+            downloadCount: 0
+        };
+        
+        resources.push(newResource);
+        localStorage.setItem('eduResources_FET', JSON.stringify(resources));
+        
+        document.getElementById('resourceTitle').value = '';
+        document.getElementById('resourceDesc').value = '';
+        document.getElementById('resourceLink').value = '';
+        if (fileInput) fileInput.value = '';
+        document.getElementById('capsConfirm').checked = false;
+        
+        renderTutorResources();
+        renderStudentResources();
+        updateProgress();
+        showToast('✅ CAPS-aligned resource uploaded successfully!');
+    }
+    
     function viewChildProgress() {
         const p = resources.length ? Math.round((completed.length / resources.length) * 100) : 0;
+        
+        let encouragement = '';
+        if (p >= 80) encouragement = '🏆 Excellent! Your child is well-prepared for Matric exams.';
+        else if (p >= 50) encouragement = '📈 Good progress! Encourage consistent revision of challenging topics.';
+        else encouragement = '💪 Focus on completing more CAPS topics. Regular study sessions will help build momentum.';
+        
         document.getElementById('parentContent').innerHTML = `
             <div class="resource-item">
-                <div>
-                    <h4>📊 CAPS Curriculum Progress Report</h4>
-                    <p>Completed ${completed.length} of ${resources.length} CAPS topics (${p}%)</p>
-                    <div class="progress-bar-container"><div class="progress-bar" style="width:${p}%"></div></div>
-                    <p>🏅 <strong>Matric Exam Readiness:</strong> ${p >= 80 ? 'Excellent! Your child is well-prepared for Matric.' : p >= 50 ? 'Good progress toward Matric. Encourage consistent revision.' : 'Focus on completing more CAPS topics before exams.'}</p>
-                    <p style="margin-top:0.5rem;">📅 Recommended: Past paper practice for Grade 11 and 12 learners.</p>
+                <div style="width: 100%;">
+                    <h4><i class="fas fa-chart-line"></i> CAPS Curriculum Progress Report</h4>
+                    <p>Completed <strong>${completed.length}</strong> of <strong>${resources.length}</strong> CAPS topics (${p}%)</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${p}%"></div>
+                    </div>
+                    <p style="margin-top: 1rem;"><i class="fas fa-medal"></i> <strong>Matric Exam Readiness:</strong> ${encouragement}</p>
+                    <p style="margin-top: 0.5rem; background: #f8f9fa; padding: 0.75rem; border-radius: 8px;">
+                        <i class="fas fa-lightbulb"></i> <strong>Parent Tip:</strong> Past papers and practice questions 
+                        available in the Premium section for R10/month.
+                    </p>
                 </div>
             </div>
         `;
     }
     
-    // Section Navigation
-    function showStudentSection(section) {
-        document.getElementById('studentSubjectsSection').style.display = section === 'subjects' ? 'block' : 'none';
-        document.getElementById('studentResourcesSection').style.display = section === 'resources' ? 'block' : 'none';
-        document.getElementById('studentQuizzesSection').style.display = section === 'quizzes' ? 'block' : 'none';
-        document.getElementById('studentPremiumSection').style.display = section === 'premium' ? 'block' : 'none';
-        if (section === 'resources') renderStudentResources();
-        if (section === 'quizzes') renderQuizzesList();
-    }
-    
-    function showParentSection(section) {
-        document.getElementById('parentProgressSection').style.display = section === 'progress' ? 'block' : 'none';
-        document.getElementById('parentResourcesSection').style.display = section === 'resources' ? 'block' : 'none';
-        if (section === 'resources') {
-            document.getElementById('parentResourcesList').innerHTML = resources.map(r => `<div class="resource-item"><div><h4>${r.title}</h4><p>${r.desc}</p><div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div></div></div>`).join('');
+    function upgradeToPremium() {
+        if (!yoco) {
+            showToast('Payment system is initializing. Please refresh and try again.', 'error');
+            return;
         }
+        
+        yoco.showPopup({
+            amountInCents: 1000,
+            currency: 'ZAR',
+            name: 'EduConnect FET Premium',
+            description: 'Monthly subscription - Full access to all CAPS resources',
+            callback: async function(result) {
+                if (result.error) {
+                    showToast("Payment failed: " + result.error.message, 'error');
+                } else {
+                    showToast("✅ Payment successful! Your premium account is now active.", 'success');
+                    if (currentUser) {
+                        currentUser.membership = 'premium';
+                        sessionStorage.setItem('educonnect_current', JSON.stringify(currentUser));
+                        location.reload();
+                    }
+                }
+            }
+        });
     }
     
-    function showTutorSection(section) {
-        document.getElementById('tutorUploadSection').style.display = section === 'upload' ? 'block' : 'none';
-        document.getElementById('tutorManageSection').style.display = section === 'manage' ? 'block' : 'none';
-        document.getElementById('tutorPremiumSection').style.display = section === 'premium' ? 'block' : 'none';
-        if (section === 'manage') renderTutorResources();
-    }
-    
-    // Premium Features
     function loadQuizzes() {
         if (!currentUser || currentUser.membership !== 'premium') {
-            alert('⭐ Premium membership (R10/month) required to access quizzes. Upgrade to unlock interactive assessments.');
+            showToast('⭐ Premium membership required to access quizzes.', 'error');
             return;
         }
         showStudentSection('quizzes');
+        renderQuizzesList();
     }
     
     function loadPastPapers() {
         if (!currentUser || currentUser.membership !== 'premium') {
-            alert('⭐ Premium membership required to access past exam papers.');
+            showToast('⭐ Premium membership required to access past exam papers.', 'error');
             return;
         }
+        
         document.getElementById('premiumContent').innerHTML = `
             <div class="resource-list">
                 <div class="resource-item">
                     <div>
-                        <h4>📜 Mathematics P1 November 2024</h4>
+                        <h4><i class="fas fa-file-pdf"></i> Mathematics P1 November 2024</h4>
                         <p>DBE Official Past Paper with Memorandum</p>
-                        <button class="action-btn" onclick="window.open('https://www.education.gov.za','_blank')">📥 Download Paper</button>
+                        <span class="meta-tag">Grade 12</span>
+                        <div style="margin-top: 0.5rem;">
+                            <button class="action-btn" onclick="window.open('https://www.education.gov.za','_blank')">
+                                <i class="fas fa-download"></i> Download Paper
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="resource-item">
                     <div>
-                        <h4>📜 Physical Sciences P1 November 2024</h4>
+                        <h4><i class="fas fa-file-pdf"></i> Physical Sciences P1 November 2024</h4>
                         <p>DBE Official Past Paper with Memorandum</p>
-                        <button class="action-btn" onclick="window.open('https://www.education.gov.za','_blank')">📥 Download Paper</button>
+                        <span class="meta-tag">Grade 12</span>
+                        <div style="margin-top: 0.5rem;">
+                            <button class="action-btn" onclick="window.open('https://www.education.gov.za','_blank')">
+                                <i class="fas fa-download"></i> Download Paper
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -665,33 +1456,161 @@
     
     function loadStudyPlanner() {
         if (!currentUser || currentUser.membership !== 'premium') {
-            alert('⭐ Premium membership required to access study planner.');
+            showToast('⭐ Premium membership required to access study planner.', 'error');
             return;
         }
+        
         document.getElementById('premiumContent').innerHTML = `
             <div class="resource-list">
                 <div class="resource-item">
-                    <div>
-                        <h4>📅 Matric Study Planner (CAPS-Aligned)</h4>
-                        <p><strong>Sample Weekly Schedule:</strong><br>
-                        Monday: Mathematics & Physical Sciences<br>
-                        Tuesday: Life Sciences & Accounting<br>
-                        Wednesday: Business Studies & Economics<br>
-                        Thursday: History & Geography<br>
-                        Friday: English HL & isiXhosa HL<br>
-                        Saturday: Life Orientation & Revision<br>
-                        Sunday: Rest & Past Paper Review</p>
-                        <p>💡 Customize based on your exam timetable. Focus on weak subjects 3 months before Matric.</p>
+                    <div style="width: 100%;">
+                        <h4><i class="fas fa-calendar-alt"></i> Matric Study Planner (CAPS-Aligned)</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin: 1rem 0;">
+                            <div style="background: #f0f7ff; padding: 0.5rem; border-radius: 8px;">
+                                <strong>📅 Monday:</strong> Mathematics & Physical Sciences
+                            </div>
+                            <div style="background: #f0f7ff; padding: 0.5rem; border-radius: 8px;">
+                                <strong>📅 Tuesday:</strong> Life Sciences & Accounting
+                            </div>
+                            <div style="background: #f0f7ff; padding: 0.5rem; border-radius: 8px;">
+                                <strong>📅 Wednesday:</strong> Business Studies & Economics
+                            </div>
+                            <div style="background: #f0f7ff; padding: 0.5rem; border-radius: 8px;">
+                                <strong>📅 Thursday:</strong> History & Geography
+                            </div>
+                            <div style="background: #f0f7ff; padding: 0.5rem; border-radius: 8px;">
+                                <strong>📅 Friday:</strong> English HL & isiXhosa HL
+                            </div>
+                            <div style="background: #f0f7ff; padding: 0.5rem; border-radius: 8px;">
+                                <strong>📅 Saturday:</strong> Life Orientation & Revision
+                            </div>
+                            <div style="background: #f0f7ff; padding: 0.5rem; border-radius: 8px;">
+                                <strong>📅 Sunday:</strong> Rest & Past Paper Review
+                            </div>
+                        </div>
+                        <div style="background: #e8f5e9; padding: 1rem; border-radius: 8px;">
+                            <p><i class="fas fa-lightbulb"></i> <strong>Study Tips:</strong> Practice past papers under timed conditions, get 7-8 hours of sleep, form study groups.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
     }
     
-    // Event Listeners and Initialization
+    // ============================================================
+    // SECTION NAVIGATION
+    // ============================================================
+    
+    function showStudentSection(section) {
+        document.getElementById('studentSubjectsSection').style.display = section === 'subjects' ? 'block' : 'none';
+        document.getElementById('studentResourcesSection').style.display = section === 'resources' ? 'block' : 'none';
+        document.getElementById('studentQuizzesSection').style.display = section === 'quizzes' ? 'block' : 'none';
+        document.getElementById('studentPremiumSection').style.display = section === 'premium' ? 'block' : 'none';
+        
+        const tabs = document.querySelectorAll('#studentDashboard .nav-tab');
+        tabs.forEach((tab, idx) => {
+            tab.classList.remove('active');
+            if ((section === 'subjects' && idx === 0) ||
+                (section === 'resources' && idx === 1) ||
+                (section === 'quizzes' && idx === 2) ||
+                (section === 'premium' && idx === 3)) {
+                tab.classList.add('active');
+            }
+        });
+        
+        if (section === 'resources') renderStudentResources();
+        if (section === 'quizzes') renderQuizzesList();
+    }
+    
+    function showParentSection(section) {
+        document.getElementById('parentProgressSection').style.display = section === 'progress' ? 'block' : 'none';
+        document.getElementById('parentResourcesSection').style.display = section === 'resources' ? 'block' : 'none';
+        
+        const tabs = document.querySelectorAll('#parentDashboard .nav-tab');
+        tabs.forEach((tab, idx) => {
+            tab.classList.remove('active');
+            if ((section === 'progress' && idx === 0) || (section === 'resources' && idx === 1)) {
+                tab.classList.add('active');
+            }
+        });
+        
+        if (section === 'resources') {
+            document.getElementById('parentResourcesList').innerHTML = resources.map(r => `
+                <div class="resource-item">
+                    <div>
+                        <h4><i class="fas ${r.type === 'notes' ? 'fa-file-alt' : 'fa-download'}"></i> ${r.title}</h4>
+                        <p>${r.desc}</p>
+                        <div><span class="meta-tag">${r.grade}</span><span class="meta-tag">${r.subject}</span></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    function showTutorSection(section) {
+        document.getElementById('tutorUploadSection').style.display = section === 'upload' ? 'block' : 'none';
+        document.getElementById('tutorManageSection').style.display = section === 'manage' ? 'block' : 'none';
+        document.getElementById('tutorPremiumSection').style.display = section === 'premium' ? 'block' : 'none';
+        
+        const tabs = document.querySelectorAll('#tutorDashboard .nav-tab');
+        tabs.forEach((tab, idx) => {
+            tab.classList.remove('active');
+            if ((section === 'upload' && idx === 0) ||
+                (section === 'manage' && idx === 1) ||
+                (section === 'premium' && idx === 2)) {
+                tab.classList.add('active');
+            }
+        });
+        
+        if (section === 'manage') renderTutorResources();
+    }
+    
+    function updateCredentialField() {
+        const role = document.getElementById('signupRole').value;
+        const container = document.getElementById('credentialField');
+        if (role === 'tutor') {
+            container.innerHTML = `
+                <select id="tutorType" style="width:100%; padding:0.9rem; margin-bottom:0.5rem; border-radius:12px;">
+                    <option value="sace">SACE Registered Professional Educator</option>
+                    <option value="student">University Student Tutor</option>
+                </select>
+                <div id="tutorCredentialInput">
+                    <input type="text" id="tutorCredential" placeholder="SACE Registration Number" style="width:100%; padding:0.9rem; border-radius:12px;">
+                    <p style="font-size:0.7rem; color:#6c757d;">Enter your SACE number for verification.</p>
+                </div>
+            `;
+            const tutorTypeSelect = document.getElementById('tutorType');
+            if (tutorTypeSelect) {
+                tutorTypeSelect.addEventListener('change', function() {
+                    const inputDiv = document.getElementById('tutorCredentialInput');
+                    if (this.value === 'sace') {
+                        inputDiv.innerHTML = `<input type="text" id="tutorCredential" placeholder="SACE Registration Number" style="width:100%; padding:0.9rem; border-radius:12px;"><p style="font-size:0.7rem;">Your SACE number will be verified.</p>`;
+                    } else {
+                        inputDiv.innerHTML = `<input type="text" id="tutorCredential" placeholder="Student Number" style="width:100%; padding:0.9rem; margin-bottom:0.5rem; border-radius:12px;">
+                            <select id="universityName" style="width:100%; padding:0.9rem; border-radius:12px;">
+                                <option value="">Select University</option>
+                                <option>University of Cape Town (UCT)</option>
+                                <option>University of the Witwatersrand (Wits)</option>
+                                <option>Stellenbosch University</option>
+                                <option>University of Pretoria (UP)</option>
+                            </select>
+                            <p style="font-size:0.7rem;">Your student number helps verify your credibility as a tutor.</p>`;
+                    }
+                });
+            }
+        } else {
+            container.innerHTML = '';
+        }
+    }
+    
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
+    
     document.getElementById('signupRole').addEventListener('change', updateCredentialField);
     setTimeout(updateCredentialField, 100);
     
+    // Auth tab switching
     document.querySelectorAll('.auth-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -702,13 +1621,58 @@
         });
     });
     
-    // Check if user is already logged in
-    if (sessionStorage.getItem('educonnect_current')) {
-        document.getElementById('authModal').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        document.getElementById('logoutBtn').style.display = 'block';
-        loadDashboard();
-    }
+    // Student section tabs
+    document.querySelectorAll('#studentDashboard .nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const section = tab.getAttribute('data-student-section');
+            if (section) showStudentSection(section);
+        });
+    });
+    
+    // Parent section tabs
+    document.querySelectorAll('#parentDashboard .nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const section = tab.getAttribute('data-parent-section');
+            if (section) showParentSection(section);
+        });
+    });
+    
+    // Tutor section tabs
+    document.querySelectorAll('#tutorDashboard .nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const section = tab.getAttribute('data-tutor-section');
+            if (section) showTutorSection(section);
+        });
+    });
+    
+    // Button listeners
+    document.getElementById('loginBtn').addEventListener('click', handleLogin);
+    document.getElementById('signupBtn').addEventListener('click', handleSignup);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('publishResourceBtn').addEventListener('click', uploadResource);
+    document.getElementById('upgradePremiumBtn').addEventListener('click', upgradeToPremium);
+    document.getElementById('loadQuizzesCard')?.addEventListener('click', loadQuizzes);
+    document.getElementById('loadPastPapersCard')?.addEventListener('click', loadPastPapers);
+    document.getElementById('loadStudyPlannerCard')?.addEventListener('click', loadStudyPlanner);
+    
+    // Footer links
+    document.getElementById('privacyLink')?.addEventListener('click', (e) => { e.preventDefault(); showPrivacyPolicy(); });
+    document.getElementById('privacyFooterLink')?.addEventListener('click', (e) => { e.preventDefault(); showPrivacyPolicy(); });
+    document.getElementById('termsFooterLink')?.addEventListener('click', (e) => { e.preventDefault(); showTerms(); });
+    document.getElementById('contactFooterLink')?.addEventListener('click', (e) => { e.preventDefault(); showContact(); });
+    
+    // Initialize
+    loadLocalData();
+    initBase44();
+    initYoco();
+    
+    // Make functions global for onclick handlers
+    window.filterBySubject = filterBySubject;
+    window.markComplete = markComplete;
+    window.deleteResource = deleteResource;
+    window.upgradeToPremium = upgradeToPremium;
+    window.checkQuizAnswer = checkQuizAnswer;
+    window.showStudentSection = showStudentSection;
 </script>
 </body>
 </html>
